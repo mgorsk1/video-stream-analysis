@@ -1,0 +1,19 @@
+version: '2.2'
+services:
+#  app:
+#    build:
+#      context: ./docker
+#      dockerfile: DockerfileAnsible
+#    volumes:
+#      - .:/app
+#    command: 'tail -f /dev/null'
+  redis:
+    image: redis:5.0.3-alpine
+    privileged: true
+    ports:
+      - "6379:6379"
+  postgres:
+    image: postgres:11.1-alpine
+    privileged: true
+    ports:
+      - "5432:5432"

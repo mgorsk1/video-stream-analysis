@@ -1,0 +1,5 @@
+numpy==1.16.1
+openalpr==1.0.12
+opencv-python==4.0.0.21
+redis==3.1.0
+Psycopg2==2.7.6
