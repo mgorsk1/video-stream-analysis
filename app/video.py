@@ -9,19 +9,7 @@ BASE_PATH = path.dirname(__file__) + "/.."
 
 
 class CameraStream:
-    def __init__(self, desired_fps, handler, analyze=None):
-        if not analyze:
-            self.analyze = False
-        else:
-            self.analyze = True
-
-        self.handler = handler
-
-        # if not display:
-        #     self.display = False
-        # else:
-        #     self.display = True
-
+    def __init__(self, desired_fps, handler):
         environ['TESSDATA_PREFIX'] = "{}/runtime/ocr/".format(BASE_PATH)
         environ['LD_LIBRARY_PATH'] = "/usr/include/"
 
@@ -31,6 +19,7 @@ class CameraStream:
         self.camera = cv2.VideoCapture(-1)
 
         self.fps = ceil(self.camera.get(cv2.CAP_PROP_FPS) / desired_fps)
+        self.handler = handler
 
         self.alpr = Alpr("eu", "{}/config/openalpr.conf".format(BASE_PATH), "{}/runtime/".format(BASE_PATH))
 
