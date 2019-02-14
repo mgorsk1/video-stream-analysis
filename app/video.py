@@ -5,17 +5,17 @@ from math import ceil
 from os import path, environ
 from uuid import uuid4
 
-from app.whistleblower import Whistleblower
-
 BASE_PATH = path.dirname(__file__) + "/.."
 
 
 class CameraStream:
-    def __init__(self, desired_fps, analyze=None, display=None):
+    def __init__(self, desired_fps, handler, analyze=None):
         if not analyze:
             self.analyze = False
         else:
             self.analyze = True
+
+        self.handler = handler
 
         # if not display:
         #     self.display = False
@@ -48,8 +48,6 @@ class CameraStream:
 
         self.lineType = 2
         self.lineColors = self.fontColors
-
-        self.whistleblower = Whistleblower(10)
 
     def __enter__(self):
         self.run()
@@ -120,7 +118,7 @@ class CameraStream:
                         self.lineColors.get(conf_level),
                         self.lineType)
 
-            self.whistleblower.process(plate, conf, frame)
+            self.handler.process(plate, conf, frame)
 
         if len(result_set) > 0:
             CameraStream.save_frame(frame)
