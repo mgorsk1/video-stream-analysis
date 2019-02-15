@@ -9,7 +9,7 @@ from config import log, BASE_PATH
 
 
 class CameraStream:
-    def __init__(self, desired_fps, analyzer):
+    def __init__(self, desired_fps, precision, analyzer, **kwargs):
         environ['TESSDATA_PREFIX'] = "{}/runtime/ocr/".format(BASE_PATH)
         environ['LD_LIBRARY_PATH'] = "/usr/include/"
 
@@ -17,6 +17,7 @@ class CameraStream:
         self.names = ['low', 'medium', 'high']
 
         self.camera = cv2.VideoCapture(-1)
+        self.precision = precision
 
         self.fps = ceil(self.camera.get(cv2.CAP_PROP_FPS) / desired_fps)
         self.analyzer = analyzer
@@ -25,6 +26,8 @@ class CameraStream:
 
         self.alpr.set_top_n(5)
         self.alpr.set_default_region("pl")
+
+        self.metadata = dict(kwargs)
 
         if not self.alpr.is_loaded():
             print("ALPR NOT LOADED")
@@ -54,35 +57,37 @@ class CameraStream:
 
     def analyze_frame(self):
         res, frame = self.get_raw_frame()
-
         recognition = self.alpr.recognize_ndarray(frame)
         results = recognition.get('results')
 
         result_set = list()
 
-        good_guess = False
+        from pprint import pprint
 
         if len(results) > 0:
+
+            #pprint(results)
+
             for result in results:
-                for x in result['candidates']:
-                    plate, confidence = x.get('plate'), x.get('confidence')
+                plate, confidence = result.get('plate'), result.get('confidence')
 
-                    if confidence > 93:
-                        good_guess = True
-                        break
+                if confidence > self.precision:
+                        candidates = [x.get('plate') for x in result.get('candidates')]
 
-                if good_guess:
-                    x1 = min([c.get('x') for c in result['coordinates']])
-                    x2 = max([c.get('x') for c in result['coordinates']])
+                        x1 = min([c.get('x') for c in result['coordinates']])
+                        x2 = max([c.get('x') for c in result['coordinates']])
 
-                    y1 = max([c.get('y') for c in result['coordinates']])
-                    y2 = min([c.get('y') for c in result['coordinates']])
+                        y1 = max([c.get('y') for c in result['coordinates']])
+                        y2 = min([c.get('y') for c in result['coordinates']])
 
-                    coordinates = [(x1, y1), (x2, y2)]
+                        coordinates = [(x1, y1), (x2, y2)]
 
-                    plate, confidence = result['candidates'][0].get('plate'), result['candidates'][0].get('confidence')
+                        plate, confidence = result['candidates'][0].get('plate'), result['candidates'][0].get('confidence')
 
-                    result_set.append(dict(coordinates=coordinates, plate=plate, confidence=confidence))
+                        result_set.append(dict(coordinates=coordinates,
+                                               plate=plate,
+                                               confidence=confidence,
+                                               candidates=candidates))
 
         for result in result_set:
             plate = result.get('plate')
@@ -92,6 +97,8 @@ class CameraStream:
 
             cord1 = result.get('coordinates')[0]
             cord2 = result.get('coordinates')[1]
+
+            candidates = result.get('candidates')
 
             cv2.rectangle(frame,
                           cord1,
@@ -115,7 +122,8 @@ class CameraStream:
 
             log.debug('#recognized plate on #frame', dict(plate=plate, confidence=conf))
 
-            self.analyzer.process(plate, conf, frame)
+            additional_data = dict(metadata=self.metadata, candidates=candidates)
+            self.analyzer.process(plate, conf, frame, **additional_data)
 
         return result_set, frame
 

@@ -11,7 +11,7 @@ class Whistleblower(Analyzer):
 
         self.executor = PoliceNotifier(8*60*60)
 
-    def process(self, plate, confidence, image):
+    def process(self, plate, confidence, image, **kwargs):
         # check if already notified about plate
         #   if not - check if already detected plate
         #       if yes - check plate whether it's within its grace_period
@@ -35,7 +35,7 @@ class Whistleblower(Analyzer):
                 time_passed = now - time_added
 
                 if time_passed > self.grace_period:
-                    self.executor.run(plate, confidence, image)
+                    self.executor.run(plate, confidence, image, **dict(kwargs))
             else:
                 self.tdb.set_key(plate+':N',
                                  dict(confidence=confidence,

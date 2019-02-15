@@ -8,7 +8,7 @@ class Gatekeeper(Analyzer):
 
         self.executor = GateOpener(3*60)
 
-    def process(self, plate, confidence, image):
+    def process(self, plate, confidence, image, **kwargs):
         # check if already opened the gate for this car
         #   if yes - do nothing
         #   if no - check if plate in database
@@ -21,4 +21,4 @@ class Gatekeeper(Analyzer):
             license_plate_allowed = self.tdb.get_key(plate+':A')
 
             if license_plate_allowed:
-                self.executor.run(plate, confidence, image)
+                self.executor.run(plate, confidence, image, **dict(kwargs))
