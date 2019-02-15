@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "formatters": {
+    "simple": {
+      "format": "%(asctime)s %(levelname)s %(process)d %(threadName)s %(module)s %(funcName)s %(lineno)s %(message)s"
+    },
+    "json": {
+      "()": "app.logger.CustomJsonFormatter",
+      "format": "(levelname) (name) (process) (processName) (message) (threadName) (thread) (lineno) (module) (funcName)"
+    }
+  },
+  "handlers": {
+    "console": {
+      "class": "logging.StreamHandler",
+      "formatter": "simple",
+      "stream": "ext://sys.stdout"
+    },
+    "file": {
+      "class": "logging.handlers.TimedRotatingFileHandler",
+      "formatter": "json",
+      "filename": "{log_file_path}/{app_name}.log",
+      "when": "midnight",
+      "interval": 1,
+      "backupCount": 14
+    }
+  },
+  "loggers": {
+    "main": {
+      "level": "{log_level}",
+      "handlers": [
+        "console",
+        "file"
+      ]
+    }
+  },
+  "root": {
+    "level": "{log_level}",
+    "handlers": [
+      "console",
+      "file"
+    ]
+  }
+}

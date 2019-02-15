@@ -3,3 +3,5 @@ openalpr==1.0.12
 opencv-python==4.0.0.21
 redis==3.1.0
 Psycopg2==2.7.6
+elasticsearch==6.3.1
+python-json-logger==0.1.10

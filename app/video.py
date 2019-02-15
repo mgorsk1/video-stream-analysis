@@ -2,10 +2,10 @@ import cv2
 
 from openalpr import Alpr
 from math import ceil
-from os import path, environ
-from uuid import uuid4
+from os import environ
+from time import strftime
 
-BASE_PATH = path.dirname(__file__) + "/.."
+from config import log, BASE_PATH
 
 
 class CameraStream:
@@ -113,10 +113,9 @@ class CameraStream:
                             (0, 0, 0),
                             self.lineType)
 
-            self.analyzer.process(plate, conf, frame)
+            log.debug('#recognized plate on #frame', dict(plate=plate, confidence=conf))
 
-        if len(result_set) > 0:
-            CameraStream.save_frame(frame)
+            self.analyzer.process(plate, conf, frame)
 
         return result_set, frame
 
@@ -151,6 +150,3 @@ class CameraStream:
     def display(frame):
         cv2.imshow("frame", frame)
 
-    @staticmethod
-    def save_frame(frame):
-        cv2.imwrite("{}/output/{}.png".format(BASE_PATH, uuid4()), frame)

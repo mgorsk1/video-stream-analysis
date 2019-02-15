@@ -11,7 +11,7 @@ class Executor:
         self.reset_after = reset_after
 
         self.rdb = ResultDatabase()
-        self.tdb = TemporaryDatabase()
+        self.tdb = TemporaryDatabase("localhost", 6379)
 
     def run(self, plate, confidence, image):
         value = dumps(dict(time_added=time(), confidence=confidence)).encode('utf-8')

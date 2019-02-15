@@ -7,7 +7,7 @@ class Analyzer:
         # in seconds
         self.grace_period = grace_period
 
-        self.tdb = TemporaryDatabase()
+        self.tdb = TemporaryDatabase("localhost", 6379)
 
     @abstractmethod
     def process(self):
