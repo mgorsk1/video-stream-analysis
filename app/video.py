@@ -99,13 +99,19 @@ class CameraStream:
                           self.lineColors.get(conf_level),
                           2)
 
-            cv2.putText(frame,
-                        '{} ({})'.format(plate, round(conf, 4)),
-                        cord2,
-                        self.font,
-                        self.fontScale,
-                        self.lineColors.get(conf_level),
-                        self.lineType)
+            info_to_print = ['Date: ' + strftime('%Y/%m/%d %H:%M:%S'), 'Plate: ' + plate, 'Confidence: ' + str(round(conf, 2))+'%']
+
+            cv2.rectangle(frame, (cord1[0], cord1[1] + 5), (cord1[0] + 230, 5 + cord1[1] + (len(info_to_print) * 20)),
+                          (255, 255, 255), -1)
+
+            for i, info in enumerate(info_to_print):
+                cv2.putText(frame,
+                            str(info),
+                            (cord1[0], cord1[1]+20+(i*20)),
+                            self.font,
+                            self.fontScale,
+                            (0, 0, 0),
+                            self.lineType)
 
             self.analyzer.process(plate, conf, frame)
 
