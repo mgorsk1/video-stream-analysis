@@ -1,5 +1,4 @@
-from app.database import TemporaryDatabase
-from app.notify import Notifier
+from app.executors.notify import PoliceNotifier
 from json import loads
 from time import time
 
@@ -7,13 +6,10 @@ from . import Analyzer
 
 
 class Whistleblower(Analyzer):
-    def __init__(self, grace_period):
-        # in seconds
-        self.grace_period = grace_period
+    def __init__(self, *args, **kwargs):
+        super(Whistleblower, self).__init__(*args, **kwargs)
 
-        self.db = TemporaryDatabase()
-
-        self.notifier = Notifier(8*60*60)
+        self.executor = PoliceNotifier(8*60*60)
 
     def process(self, plate, confidence, image):
         # check if already notified about plate
@@ -23,14 +19,11 @@ class Whistleblower(Analyzer):
         #           if no - skip
         #       if no - add to redis
         #   if yes - do nothing
-        # statuses: 0 - plate completely new, 1 - plate within grace period, 2 - plate already filed
 
-        already_filed = self.db.get_key(plate+':Y')
+        already_filed = self.tdb.get_key(plate+':Y')
 
-        if already_filed:
-            return 2
-        else:
-            already_detected = self.db.get_key(plate+':N')
+        if not already_filed:
+            already_detected = self.tdb.get_key(plate+':N')
 
             if already_detected:
 
@@ -42,15 +35,10 @@ class Whistleblower(Analyzer):
                 time_passed = now - time_added
 
                 if time_passed > self.grace_period:
-                    self.notifier.notify(plate, confidence, image)
-                    return 2
-                else:
-                    return 1
+                    self.executor.run(plate, confidence, image)
             else:
-                self.db.set_key(plate+':N',
-                                dict(confidence=confidence,
-                                     plate=plate,
-                                     time_added=time()),
-                                     ex=self.grace_period+60)
-
-                return 0
+                self.tdb.set_key(plate+':N',
+                                 dict(confidence=confidence,
+                                      plate=plate,
+                                      time_added=time()),
+                                      ex=self.grace_period+60)

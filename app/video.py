@@ -9,7 +9,7 @@ BASE_PATH = path.dirname(__file__) + "/.."
 
 
 class CameraStream:
-    def __init__(self, desired_fps, handler):
+    def __init__(self, desired_fps, analyzer):
         environ['TESSDATA_PREFIX'] = "{}/runtime/ocr/".format(BASE_PATH)
         environ['LD_LIBRARY_PATH'] = "/usr/include/"
 
@@ -19,7 +19,7 @@ class CameraStream:
         self.camera = cv2.VideoCapture(-1)
 
         self.fps = ceil(self.camera.get(cv2.CAP_PROP_FPS) / desired_fps)
-        self.handler = handler
+        self.analyzer = analyzer
 
         self.alpr = Alpr("eu", "{}/config/openalpr.conf".format(BASE_PATH), "{}/runtime/".format(BASE_PATH))
 
@@ -47,13 +47,13 @@ class CameraStream:
 
         self.alpr.unload()
 
-    def raw_frame(self):
+    def get_raw_frame(self):
         res, frame = self.camera.read()
 
         return res, frame
 
-    def analyzed_frame(self):
-        res, frame = self.raw_frame()
+    def analyze_frame(self):
+        res, frame = self.get_raw_frame()
 
         recognition = self.alpr.recognize_ndarray(frame)
         results = recognition.get('results')
@@ -107,7 +107,7 @@ class CameraStream:
                         self.lineColors.get(conf_level),
                         self.lineType)
 
-            self.handler.process(plate, conf, frame)
+            self.analyzer.process(plate, conf, frame)
 
         if len(result_set) > 0:
             CameraStream.save_frame(frame)
@@ -128,14 +128,12 @@ class CameraStream:
         return result
 
     def run(self):
-        mode = self.analyzed_frame if self.analyze else self.raw_frame
-
         i = 0
 
         while True:
             i += 1
 
-            results, frame = mode()
+            results, frame = self.analyze_frame()
 
             if i % self.fps == 0:
                 CameraStream.display(frame)

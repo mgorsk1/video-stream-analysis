@@ -20,6 +20,8 @@ class TemporaryDatabase:
         else:
             self.db.set(key, value, nx=True)
 
+        print('added key {}'.format(key))
+
     def delete_key(self, plate):
         self.db.delete(plate)
 
