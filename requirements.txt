@@ -1,7 +1,9 @@
+elasticsearch==6.3.1
+inflection==0.3.1
 numpy==1.16.1
 openalpr==1.0.12
 opencv-python==4.0.0.21
-redis==3.1.0
-Psycopg2==2.7.6
-elasticsearch==6.3.1
+psycopg2==2.7.6
 python-json-logger==0.1.10
+redis==3.1.0
+urllib3==1.24.1
