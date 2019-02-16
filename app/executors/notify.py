@@ -22,8 +22,12 @@ class PoliceNotifier(Executor):
         camera_location = dict(kwargs).get('metadata', dict()).get('cameraLocation', 'n/a')
         camera_id = dict(kwargs).get('metadata', dict()).get('cameraId', 'n/a')
 
-        self.notify_pushover(title_template.format(cl=camera_location, rn=plate),
-                             message_template.format(rn=plate, cf=str(round(confidence,3))+'%', cid=camera_id, cl=camera_location),
+        self.notify_pushover(title_template.format(cl=camera_location,
+                                                   rn=plate),
+                             message_template.format(rn=plate,
+                                                     cf=str(round(confidence, 3))+'%',
+                                                     cid=camera_id,
+                                                     cl=camera_location),
                              cloud_file)
 
         log.info("#police notified about #rascal", extra=dict(plate=plate))
