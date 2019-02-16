@@ -85,21 +85,27 @@ class Executor:
         :param url: optional url to pass
         :return: -
         """
-        def notify():
-            request_data = dict(token=self.pushover_config.get("APP_TOKEN", ""),
-                                user=self.pushover_config.get("USER_KEY", ""),
-                                message=message,
-                                device="pw-bd-project-funct-pushover_notify",
-                                title=title,
-                                url=url)
+        result = None
+        device = "video-analysis"
 
-            try:
-                result = post("https://api.pushover.net/1/messages.json", data=request_data)
-            except:
-                raise HTTPError
+        request_data = dict(token=self.pushover_config.get("APP_TOKEN", ""),
+                            user=self.pushover_config.get("USER_KEY", ""),
+                            message=message,
+                            device=device,
+                            title=title,
+                            url=url)
 
-        t = Thread(target=notify())
-        t.start()
+        try:
+            result = post("https://api.pushover.net/1/messages.json", data=request_data)
+
+            log.info("#delivered #pushover #notification", extra=dict(pushover=dict(message=message,
+                                                                                    title=title,
+                                                                                    url=url,
+                                                                                    device=device)))
+        except HTTPError:
+            log.error("error while #sending #pushover #notification", exc_info=True)
+
+        return result
 
     def save_image_to_gcp(self, plate, image, uuid):
         tmp_file = Executor.save_image_locally(plate, image, uuid, 'tmp', 'png')
@@ -114,6 +120,10 @@ class Executor:
 
         remove(tmp_file)
 
+        log.info("#image sent to #gcp #bucket", extra=dict(gcp=dict(bucket=self.index_name,
+                                                                    fileName=filename,
+                                                                    publicUrl=blob.public_url)))
+
         return blob.public_url
 
     @staticmethod
@@ -124,7 +134,7 @@ class Executor:
 
         cv2.imwrite(full_path, image)
 
-        log.info("#saved #image", extra=dict(filePath=full_path))
+        log.info("#saved #image", extra=dict(filePath=full_path, folder=folder, ext=ext))
 
         return full_path
 
