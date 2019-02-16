@@ -57,6 +57,8 @@ class CameraStream:
 
     def analyze_frame(self):
         res, frame = self.get_raw_frame()
+        clean_frame = frame.copy()
+
         recognition = self.alpr.recognize_ndarray(frame)
         results = recognition.get('results')
 
@@ -84,7 +86,7 @@ class CameraStream:
                                                candidates=candidates))
 
         for result in result_set:
-            image = frame.copy()
+            image = clean_frame.copy()
 
             images = [frame, image]
 
