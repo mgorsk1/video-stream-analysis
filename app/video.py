@@ -24,7 +24,7 @@ class CameraStream:
 
         self.alpr = Alpr("eu", "{}/config/openalpr.conf".format(BASE_PATH), "{}/runtime/".format(BASE_PATH))
 
-        self.alpr.set_top_n(5)
+        self.alpr.set_top_n(10)
         self.alpr.set_default_region("pl")
 
         self.metadata = dict(kwargs)
@@ -61,13 +61,7 @@ class CameraStream:
         results = recognition.get('results')
 
         result_set = list()
-
-        from pprint import pprint
-
         if len(results) > 0:
-
-            #pprint(results)
-
             for result in results:
                 plate, confidence = result.get('plate'), result.get('confidence')
 
@@ -90,6 +84,10 @@ class CameraStream:
                                                candidates=candidates))
 
         for result in result_set:
+            image = frame.copy()
+
+            images = [frame, image]
+
             plate = result.get('plate')
 
             conf = result.get('confidence')
@@ -100,30 +98,31 @@ class CameraStream:
 
             candidates = result.get('candidates')
 
-            cv2.rectangle(frame,
-                          cord1,
-                          cord2,
-                          self.lineColors.get(conf_level),
-                          2)
+            for pic in images:
+                cv2.rectangle(pic,
+                              cord1,
+                              cord2,
+                              self.lineColors.get(conf_level),
+                              2)
 
-            info_to_print = ['Date: ' + strftime('%Y/%m/%d %H:%M:%S'), 'Plate: ' + plate, 'Confidence: ' + str(round(conf, 2))+'%']
+                info_to_print = ['Date: ' + strftime('%Y/%m/%d %H:%M:%S'), 'Plate: ' + plate, 'Confidence: ' + str(round(conf, 2))+'%']
 
-            cv2.rectangle(frame, (cord1[0], cord1[1] + 5), (cord1[0] + 230, 5 + cord1[1] + (len(info_to_print) * 20)),
-                          (255, 255, 255), -1)
+                cv2.rectangle(image, (cord1[0], cord1[1] + 5), (cord1[0] + 230, 5 + cord1[1] + (len(info_to_print) * 20)),
+                              (255, 255, 255), -1)
 
-            for i, info in enumerate(info_to_print):
-                cv2.putText(frame,
-                            str(info),
-                            (cord1[0], cord1[1]+20+(i*20)),
-                            self.font,
-                            self.fontScale,
-                            (0, 0, 0),
-                            self.lineType)
+                for i, info in enumerate(info_to_print):
+                    cv2.putText(pic,
+                                str(info),
+                                (cord1[0], cord1[1]+20+(i*20)),
+                                self.font,
+                                self.fontScale,
+                                (0, 0, 0),
+                                self.lineType)
 
             log.debug('#recognized plate on #frame', dict(plate=plate, confidence=conf))
 
             additional_data = dict(metadata=self.metadata, candidates=candidates)
-            self.analyzer.process(plate, conf, frame, **additional_data)
+            self.analyzer.process(plate, conf, image, **additional_data)
 
         return result_set, frame
 
