@@ -14,7 +14,8 @@ class Executor:
     def __init__(self, reset_after):
         self.reset_after = reset_after
 
-        self.rdb = ResultDatabase("localhost", 9200, underscore(self.__class__.__name__))
+        self.index_name = underscore(self.__class__.__name__)
+        self.rdb = ResultDatabase("localhost", 9200, self.index_name)
         self.tdb = TemporaryDatabase("localhost", 6379)
 
     def run(self, plate, confidence, image, **kwargs):
