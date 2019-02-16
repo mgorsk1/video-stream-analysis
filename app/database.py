@@ -89,3 +89,4 @@ class ResultDatabase:
         body.update(dict(kwargs))
 
         self.db.index('plates', 'default', body, id=id)
+        self.db.indices.refresh('plates')
