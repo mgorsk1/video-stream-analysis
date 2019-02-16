@@ -3,7 +3,7 @@ from app.database import TemporaryDatabase
 
 
 class Analyzer:
-    def __init__(self, grace_period):
+    def __init__(self, grace_period, **kwargs):
         # in seconds
         self.grace_period = grace_period
 

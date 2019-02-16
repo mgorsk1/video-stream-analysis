@@ -8,6 +8,11 @@ class Gatekeeper(Analyzer):
 
         self.executor = GateOpener(3*60)
 
+        whitelist = dict(kwargs).get('whitelist')
+        if whitelist:
+            for plate in whitelist:
+                self.tdb.set_key(plate+':A', 'whitelisted')
+
     def process(self, plate, confidence, image, **kwargs):
         # check if already opened the gate for this car
         #   if yes - do nothing
