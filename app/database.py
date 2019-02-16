@@ -33,7 +33,7 @@ class TemporaryDatabase:
         else:
             self.db.set(key, vaule_dumped, nx=True)
 
-        log.debug('#set value for #redis #key', extra=dict(key=key, value=value))
+        log.debug('#set value for #redis #key', extra=dict(key=key, value=vaule_dumped))
 
     def delete_key(self, key):
         self.db.delete(key)
