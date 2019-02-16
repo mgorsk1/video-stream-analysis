@@ -17,4 +17,13 @@ class PoliceNotifier(Executor):
                     self.rdb.index_result(plate, confidence, uuid, **dict(kwargs))
 
                     log.info("#notification send about plate", extra=dict(plate=plate, confidence=confidence))
+                else:
+                    log.info("#plate existed amongst candidates in #database", extra=dict(plate=plate))
+                    self.tdb.set_key(plate+':Y', 'candidate existed', ex=self.reset_after)
+            else:
+                log.info("#plate matched another #similar plate in #database", extra=dict(plate=plate))
+                self.tdb.set_key(plate+':Y', 'similar existed', ex=self.reset_after)
+        else:
+            log.info("#plate existed in #database", extra=dict(plate=plate))
+
         pass
