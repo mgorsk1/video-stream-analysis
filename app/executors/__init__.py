@@ -3,8 +3,8 @@ import cv2
 from abc import abstractmethod
 from json import dumps
 from time import time
-from threading import Thread
 from uuid import uuid4
+from inflection import underscore
 
 from app.database import ResultDatabase, TemporaryDatabase
 from config import log, BASE_PATH
@@ -14,7 +14,7 @@ class Executor:
     def __init__(self, reset_after):
         self.reset_after = reset_after
 
-        self.rdb = ResultDatabase("localhost", 9200)
+        self.rdb = ResultDatabase("localhost", 9200, underscore(self.__class__.__name__))
         self.tdb = TemporaryDatabase("localhost", 6379)
 
     def run(self, plate, confidence, image, **kwargs):

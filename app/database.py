@@ -42,8 +42,10 @@ class TemporaryDatabase:
 
 
 class ResultDatabase:
-    def __init__(self, host, port):
+    def __init__(self, host, port, index):
         self.db = Elasticsearch(hosts=[dict(host=host, port=port)])
+
+        self.index = index
 
     def check_if_exists(self, field, value, fuzzy):
         if fuzzy:
@@ -67,7 +69,7 @@ class ResultDatabase:
             }
 
         try:
-            search = self.db.search('plates', 'default', query)
+            search = self.db.search(self.index, 'default', query)
         except ElasticsearchException:
             log.error("#error querying #elasticsearch", exc_info=True)
             return False
@@ -88,5 +90,5 @@ class ResultDatabase:
 
         body.update(dict(kwargs))
 
-        self.db.index('plates', 'default', body, id=id)
-        self.db.indices.refresh('plates')
+        self.db.index(self.index, 'default', body, id=id)
+        self.db.indices.refresh(self.index)
