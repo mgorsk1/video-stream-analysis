@@ -107,7 +107,7 @@ class CameraStream:
 
                 info_to_print = ['Date: ' + strftime('%Y/%m/%d %H:%M:%S'), 'Plate: ' + plate, 'Confidence: ' + str(round(conf, 2))+'%']
 
-                cv2.rectangle(image, (cord1[0], cord1[1] + 5), (cord1[0] + 230, 5 + cord1[1] + (len(info_to_print) * 20)),
+                cv2.rectangle(pic, (cord1[0], cord1[1] + 5), (cord1[0] + 230, 5 + cord1[1] + (len(info_to_print) * 20)),
                               (255, 255, 255), -1)
 
                 for i, info in enumerate(info_to_print):
