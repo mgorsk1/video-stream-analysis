@@ -1,5 +1,6 @@
 import cv2
 
+from abc import abstractmethod
 from openalpr import Alpr
 from math import ceil
 from os import environ
@@ -8,19 +9,20 @@ from time import strftime
 from config import log, BASE_PATH
 
 
-class CameraStream:
+class Stream:
     def __init__(self, desired_fps, precision, analyzer, **kwargs):
         environ['TESSDATA_PREFIX'] = "{}/runtime/ocr/".format(BASE_PATH)
         environ['LD_LIBRARY_PATH'] = "/usr/include/"
 
+        self.camera = None
+        self.fps = None
+
+        self.precision = precision
+        self.analyzer = analyzer
+        self.desired_fps = desired_fps
+
         self.levels = [0, 50, 90, 100]
         self.names = ['low', 'medium', 'high']
-
-        self.camera = cv2.VideoCapture(-1)
-        self.precision = precision
-
-        self.fps = ceil(self.camera.get(cv2.CAP_PROP_FPS) / desired_fps)
-        self.analyzer = analyzer
 
         self.alpr = Alpr("eu", "{}/config/openalpr.conf".format(BASE_PATH), "{}/runtime/".format(BASE_PATH))
 
@@ -41,19 +43,16 @@ class CameraStream:
         self.lineType = 2
         self.lineColors = self.fontColors
 
+    @abstractmethod
+    def get_raw_frame(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def __exit__(self, exc_type, exc_value, traceback):
+        raise NotImplementedError
+
     def __enter__(self):
         self.run()
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.camera.release()
-        cv2.destroyAllWindows()
-
-        self.alpr.unload()
-
-    def get_raw_frame(self):
-        res, frame = self.camera.read()
-
-        return res, frame
 
     def analyze_frame(self):
         res, frame = self.get_raw_frame()
@@ -150,7 +149,7 @@ class CameraStream:
             results, frame = self.analyze_frame()
 
             if i % self.fps == 0:
-                CameraStream.display(frame)
+                Stream.display(frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -158,4 +157,25 @@ class CameraStream:
     @staticmethod
     def display(frame):
         cv2.imshow("frame", frame)
+
+
+class LocalCameraStream(Stream):
+    def __init__(self, *args, **kwargs):
+        super(LocalCameraStream, self).__init__(*args, **kwargs)
+
+        self.camera = cv2.VideoCapture(-1)
+        self.fps = ceil(self.camera.get(cv2.CAP_PROP_FPS) / self.desired_fps)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.camera.release()
+        cv2.destroyAllWindows()
+
+        self.alpr.unload()
+
+    def get_raw_frame(self):
+        res, frame = self.camera.read()
+
+        return res, frame
+
+
 
