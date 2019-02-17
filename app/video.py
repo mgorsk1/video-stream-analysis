@@ -5,6 +5,7 @@ from openalpr import Alpr
 from math import ceil
 from os import environ
 from time import strftime
+from threading import Thread
 
 from config import log, BASE_PATH
 
@@ -123,7 +124,10 @@ class Stream:
             log.debug('#recognized plate on #frame', dict(plate=plate, confidence=conf))
 
             additional_data = dict(metadata=self.metadata, candidates=candidates)
-            self.analyzer.process(plate, conf, image, **additional_data)
+
+            t = Thread(target=self.analyzer.process, args=(plate, conf, image, ), kwargs=additional_data)
+
+            t.start()
 
         return result_set, frame
 

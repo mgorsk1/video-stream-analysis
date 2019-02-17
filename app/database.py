@@ -8,13 +8,21 @@ from config import log
 
 
 class TemporaryDatabase:
-    def __init__(self, host, port):
-        try:
-            self.db = Redis(host=host, port=port)
-        except Exception as e:
-            log.error('#error establishing connection with #redis', exc_info=True, extra=dict(host=host, port=port))
+    def __init__(self, host, port, **kwargs):
+        kwargs = dict(kwargs)
 
-        log.info('#established connection with #redis', extra=dict(host=host, port=port))
+        db_pass = kwargs.get('db_pass')
+
+        self.db = Redis(host=host, port=port, password=db_pass)
+
+        try:
+            db_info = self.db.info()
+
+            log.info("established #connection with #redis", extra=dict(elasticsearch=db_info))
+        except Exception as e:
+            log.error("error while establishing #connection with #redis", exc_info=True)
+
+            exit(1)
 
     def get_key(self, key):
         result = self.db.get(key)
@@ -25,16 +33,16 @@ class TemporaryDatabase:
 
     def set_key(self, key, value, ex=None):
         if not isinstance(value, bytes):
-            vaule_dumped = dumps(value).encode('utf-8')
+            value_dumped = dumps(value).encode('utf-8')
         else:
-            vaule_dumped = value
+            value_dumped = value
 
         if ex:
-            self.db.set(key, vaule_dumped, ex=ex, nx=True)
+            self.db.set(key, value_dumped, ex=ex, nx=True)
         else:
-            self.db.set(key, vaule_dumped, nx=True)
+            self.db.set(key, value_dumped, nx=True)
 
-        log.debug('#set value for #redis #key', extra=dict(key=key, value=vaule_dumped))
+        log.debug('#set value for #redis #key', extra=dict(key=key, value=value_dumped))
 
     def delete_key(self, key):
         self.db.delete(key)
@@ -54,10 +62,17 @@ class ResultDatabase:
 
         context = create_default_context() if db_scheme.endswith('s') else None
 
-        self.db = Elasticsearch(hosts=[dict(host=host, port=port)],
-                                http_auth=(db_user, db_pass),
-                                scheme=db_scheme,
+        self.db = Elasticsearch(hosts=[dict(host=host, port=port)], http_auth=(db_user, db_pass), scheme=db_scheme,
                                 ssl_context=context)
+
+        try:
+            db_info = self.db.info()
+
+            log.info("established #connection with #elasticsearch", extra=dict(elasticsearch=db_info))
+        except Exception as e:
+            log.error("error while establishing #connection with #elasticsearch", exc_info=True)
+
+            exit(1)
 
         self.index = index
 

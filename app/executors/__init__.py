@@ -7,7 +7,6 @@ from uuid import uuid4
 from inflection import underscore
 from os import getenv, environ, remove
 from requests import post, HTTPError
-from threading import Thread
 from google.cloud import storage
 
 from app.database import ResultDatabase, TemporaryDatabase
@@ -28,7 +27,7 @@ class Executor:
                                          db_pass=getenv('RDB_PASS'),
                                          db_scheme=config.get('RDB_SCHEME')))
 
-        self.tdb = TemporaryDatabase("localhost", 6379)
+        self.tdb = TemporaryDatabase(config.get('TDB_HOST'), config.get('TDB_PORT'), **dict(db_pass=getenv('TDB_PASS')))
 
         self.pushover_config = dict(APP_TOKEN=getenv("PUSHOVER_APP_TOKEN"), USER_KEY=getenv("PUSHOVER_USER_KEY"))
 
@@ -66,8 +65,7 @@ class Executor:
                 if not self.rdb.check_if_exists('candidates', plate, self.reset_after, False):
                     log.info("#plate does not exist amongst candidates in #database", extra=dict(plate=plate))
 
-                    t = Thread(target=self.action, args=(plate, confidence, image, uuid, ), kwargs=dict(kwargs))
-                    t.start()
+                    self.action(plate, confidence, image, uuid, **dict(kwargs))
 
                     log.info("#notification send about plate", extra=dict(plate=plate, confidence=confidence))
                 else:
