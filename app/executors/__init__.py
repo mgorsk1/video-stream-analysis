@@ -11,7 +11,7 @@ from threading import Thread
 from google.cloud import storage
 
 from app.database import ResultDatabase, TemporaryDatabase
-from config import log, BASE_PATH
+from config import log, BASE_PATH, config
 
 
 class Executor:
@@ -21,10 +21,26 @@ class Executor:
         self.reset_after = reset_after
 
         self.index_name = underscore(self.__class__.__name__)
-        self.rdb = ResultDatabase("localhost", 9200, self.index_name)
+        self.rdb = ResultDatabase(config.get('RDB_HOST'),
+                                  config.get('RDB_PORT'),
+                                  self.index_name,
+                                  **dict(db_user=config.get('RDB_USER'),
+                                         db_pass=getenv('RDB_PASS'),
+                                         db_scheme=config.get('RDB_SCHEME')))
+
         self.tdb = TemporaryDatabase("localhost", 6379)
 
         self.pushover_config = dict(APP_TOKEN=getenv("PUSHOVER_APP_TOKEN"), USER_KEY=getenv("PUSHOVER_USER_KEY"))
+
+        client = Executor._get_storage_client()
+
+        self.bucket = client.bucket(self.index_name)
+
+        if not self.bucket.exists():
+            self.bucket.create()
+            self.bucket.make_public(recursive=True, future=True)
+
+            log.info("#created public #gcp #bucket", extra=dict(bucket=self.index_name))
 
     @abstractmethod
     def action(self, plate, confidence, image, **kwargs):
@@ -43,11 +59,11 @@ class Executor:
         self.take_action(plate, confidence, image, run_uuid, **dict(kwargs))
 
     def take_action(self, plate, confidence, image, uuid, **kwargs):
-        if not self.rdb.check_if_exists(self.index_name, plate, False):
+        if not self.rdb.check_if_exists('plate', plate, self.reset_after, False):
             log.info("#plate does not exist in result #database", extra=dict(plate=plate))
-            if not self.rdb.check_if_exists('plate', plate, True):
+            if not self.rdb.check_if_exists('plate', plate, self.reset_after, True):
                 log.info("#similar #plate does not exist in result #database", extra=dict(plate=plate))
-                if not self.rdb.check_if_exists('candidates', plate, False):
+                if not self.rdb.check_if_exists('candidates', plate, self.reset_after, False):
                     log.info("#plate does not exist amongst candidates in #database", extra=dict(plate=plate))
 
                     t = Thread(target=self.action, args=(plate, confidence, image, uuid, ), kwargs=dict(kwargs))
@@ -112,9 +128,7 @@ class Executor:
 
         filename = "{}_{}.png".format(plate, uuid)
 
-        client = Executor._get_storage_client()
-        bucket = client.bucket(self.index_name)
-        blob = bucket.blob(filename)
+        blob = self.bucket.blob(filename)
 
         blob.upload_from_filename(tmp_file, content_type="image/png")
 

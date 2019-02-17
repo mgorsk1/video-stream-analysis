@@ -1,0 +1,8 @@
+{
+  "RDB_HOST": "mgorski-onwelo-4609384548.ap-southeast-2.bonsaisearch.net",
+  "RDB_PORT": "443",
+  "RDB_USER": "Bno5up4Gzt",
+  "RDB_SCHEME": "https",
+  "TDB_HOST": "localhost",
+  "TDB_PORT": "6379"
+}

@@ -160,10 +160,25 @@ class Stream:
 
 
 class LocalCameraStream(Stream):
+    camera_properties = {k: v for k, v in globals().get("cv2", dict()).__dict__.items() if k.startswith('CAP_PROP_')}
+
     def __init__(self, *args, **kwargs):
         super(LocalCameraStream, self).__init__(*args, **kwargs)
 
         self.camera = cv2.VideoCapture(-1)
+
+        camera_metadata = dict()
+
+        for k, v in self.camera_properties.items():
+            try:
+                val = self.camera.get(v)
+                if val > -1:
+                    camera_metadata[k] = val
+            except:
+                pass
+
+        self.metadata.update(dict(camera=camera_metadata))
+
         self.fps = ceil(self.camera.get(cv2.CAP_PROP_FPS) / self.desired_fps)
 
     def __exit__(self, exc_type, exc_value, traceback):

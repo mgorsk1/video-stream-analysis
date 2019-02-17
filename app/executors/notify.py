@@ -15,12 +15,12 @@ class PoliceNotifier(Executor):
         cloud_file = self.save_image_to_gcp(plate, image, uuid)
 
         additional_data = dict(kwargs)
-        additional_data.update(dict(gcpFileUrl=cloud_file))
+        additional_data.update(dict(gcp_file_url=cloud_file))
 
         self.rdb.index_result(plate, confidence, uuid, **additional_data)
 
-        camera_location = dict(kwargs).get('metadata', dict()).get('cameraLocation', 'n/a')
-        camera_id = dict(kwargs).get('metadata', dict()).get('cameraId', 'n/a')
+        camera_location = dict(kwargs).get('metadata', dict()).get('general',dict()).get('location', 'n/a')
+        camera_id = dict(kwargs).get('metadata', dict()).get('general',dict()).get('id', 'n/a')
 
         self.notify_pushover(title_template.format(cl=camera_location,
                                                    rn=plate),
