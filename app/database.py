@@ -13,7 +13,10 @@ class TemporaryDatabase:
 
         db_pass = kwargs.get('db_pass')
 
-        self.db = Redis(host=host, port=port, password=db_pass)
+        if db_pass:
+            self.db = Redis(host=host, port=port, password=db_pass)
+        else:
+            self.db = Redis(host=host, port=port)
 
         try:
             db_info = self.db.info()

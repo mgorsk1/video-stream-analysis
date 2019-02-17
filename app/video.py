@@ -150,7 +150,10 @@ class Stream:
         while True:
             i += 1
 
-            results, frame = self.analyze_frame()
+            if self.analyzer:
+                results, frame = self.analyze_frame()
+            else:
+                results, frame = self.get_raw_frame()
 
             if i % self.fps == 0:
                 Stream.display(frame)
@@ -163,13 +166,15 @@ class Stream:
         cv2.imshow("frame", frame)
 
 
-class LocalCameraStream(Stream):
+class CameraStreamOpenCV(Stream):
     camera_properties = {k: v for k, v in globals().get("cv2", dict()).__dict__.items() if k.startswith('CAP_PROP_')}
 
     def __init__(self, *args, **kwargs):
-        super(LocalCameraStream, self).__init__(*args, **kwargs)
+        super(CameraStreamOpenCV, self).__init__(*args, **kwargs)
 
-        self.camera = cv2.VideoCapture(-1)
+        camera_url = dict(kwargs).get('camera_url', -1)
+
+        self.camera = cv2.VideoCapture(camera_url)
 
         camera_metadata = dict()
 
