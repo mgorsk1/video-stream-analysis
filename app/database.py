@@ -65,7 +65,7 @@ class ResultDatabase:
 
     def check_if_exists(self, field, value, ago, fuzzy):
         time_ago = datetime.utcnow() - timedelta(seconds=ago)
-        time_ago = time_ago.strftime('%Y-%m-%d %H:%M:%S.%f')
+        time_ago = time_ago.strftime('%Y-%m-%dT%H:%M:%S.%f')
 
         try:
             self.db.indices.refresh(self.index)
@@ -73,12 +73,11 @@ class ResultDatabase:
             pass
 
         if fuzzy:
-            query = {"query": {"bool": {"must": {"match": {field: {"query": value, "fuzziness": 1}}}},
-                               "filter": {"range": {"@timestamp": {"gte": time_ago}}}}}
+            query = {"query": {"bool": {"must": {"match": {field: {"query": value, "fuzziness": 1}}},
+                "filter": {"range": {"@timestamp": {"gte": time_ago}}}}}}
         else:
-            query = {"query": {"bool": {"must": {"match": {field: value}}},
-                               "filter": {"range": {"@timestamp": {"gte": time_ago}}}}}
-
+            query = {"query": {
+                "bool": {"must": {"match": {field: value}}, "filter": {"range": {"@timestamp": {"gte": time_ago}}}}}}
         try:
             search = self.db.search(self.index, 'default', query)
         except ElasticsearchException:
