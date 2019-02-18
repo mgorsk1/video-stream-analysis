@@ -3,6 +3,7 @@ from json import loads
 from time import time
 
 from . import Analyzer
+from app.tools import format_plate_active, format_plate_inactive
 
 
 class Whistleblower(Analyzer):
@@ -20,10 +21,10 @@ class Whistleblower(Analyzer):
         #       if no - add to redis
         #   if yes - do nothing
 
-        already_filed = self.tdb.get_key(plate+':Y')
+        already_filed = self.tdb.get_key(format_plate_active(plate))
 
         if not already_filed:
-            already_detected = self.tdb.get_key(plate+':N')
+            already_detected = self.tdb.get_key(format_plate_inactive(plate))
 
             if already_detected:
 
@@ -37,8 +38,9 @@ class Whistleblower(Analyzer):
                 if time_passed > self.grace_period:
                     self.executor.run(plate, confidence, image, **dict(kwargs))
             else:
-                self.tdb.set_key(plate+':N',
+                self.tdb.set_key(format_plate_inactive(plate),
                                  dict(confidence=confidence,
                                       plate=plate,
                                       time_added=time()),
                                       ex=self.grace_period+60)
+
