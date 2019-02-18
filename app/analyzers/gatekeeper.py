@@ -1,5 +1,9 @@
 from . import Analyzer
 from app.executors.open import GateOpener
+from config import log
+from json import loads
+
+from app.tools import format_whitelist_key
 
 
 class Gatekeeper(Analyzer):
@@ -9,21 +13,26 @@ class Gatekeeper(Analyzer):
         self.executor = GateOpener(3*60)
 
         whitelist = dict(kwargs).get('whitelist')
+
         if whitelist:
             for plate in whitelist:
-                self.tdb.set_key(plate+':A', 'whitelisted')
+                self.tdb.set_key(format_whitelist_key(plate), 'whitelisted')
 
     def process(self, plate, confidence, image, **kwargs):
-        # check if already opened the gate for this car
+        # check if gate already opened
         #   if yes - do nothing
         #   if no - check if plate in database
-        #       if yes - open the gate
+        #       if yes - open the gate, wait n-seconds, close the gate
         #       if no - do nothing
 
-        already_opened = self.tdb.get_key(plate+':Y')
+        gate_open = self.tdb.get_key('gate:open')
 
-        if not already_opened:
-            license_plate_allowed = self.tdb.get_key(plate+':A')
+        if not gate_open:
+            license_plate_allowed = self.tdb.get_key(format_whitelist_key(plate))
 
             if license_plate_allowed:
                 self.executor.run(plate, confidence, image, **dict(kwargs))
+            else:
+                log.warning('#plate not in the #whitelist', extra=dict(plate=plate))
+        else:
+            log.warning('#gate already #opened', extra=dict(loads(gate_open)))
