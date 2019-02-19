@@ -1,7 +1,7 @@
 from abc import abstractmethod
-from app.database import TemporaryDatabase
 from os import getenv
 
+from database import TemporaryDatabase
 from config import config
 
 

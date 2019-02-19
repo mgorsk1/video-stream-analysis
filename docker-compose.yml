@@ -1,12 +1,14 @@
 version: '2.2'
 services:
-#  app:
-#    build:
-#      context: ./docker
-#      dockerfile: DockerfileAnsible
-#    volumes:
-#      - .:/app
-#    command: 'tail -f /dev/null'
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    command: 'tail -f /dev/null'
+    env_file:
+      - .env
   redis:
     image: redis:5.0.3-alpine
     privileged: true
@@ -17,10 +19,10 @@ services:
     privileged: true
     ports:
       - "9200:9200"
-  kibana:
-    image: docker.elastic.co/kibana/kibana:6.6.0
-    privileged: true
-    ports:
-      - "5601:5601"
-    volumes:
-      - ./config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:6.6.0
+#    privileged: true
+#    ports:
+#      - "5601:5601"
+#    volumes:
+#      - ./config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml

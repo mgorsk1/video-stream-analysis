@@ -1,7 +1,8 @@
-from time import time, sleep
-from . import Executor
-from config import log
 from json import dumps
+from time import time, sleep
+
+from config import log
+from . import Executor
 
 
 class GateOpener(Executor):

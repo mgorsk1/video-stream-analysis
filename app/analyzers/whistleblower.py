@@ -1,9 +1,9 @@
-from app.executors.notify import PoliceNotifier
 from json import loads
 from time import time
 
+from executors.notify import PoliceNotifier
+from tools import format_plate_active, format_plate_inactive
 from . import Analyzer
-from app.tools import format_plate_active, format_plate_inactive
 
 
 class Whistleblower(Analyzer):

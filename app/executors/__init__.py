@@ -1,15 +1,15 @@
-import cv2
-
 from abc import abstractmethod
 from json import dumps
+from os import getenv, environ, remove
 from time import time
 from uuid import uuid4
-from inflection import underscore
-from os import getenv, environ, remove
-from requests import post, HTTPError
-from google.cloud import storage
 
-from app.database import ResultDatabase, TemporaryDatabase
+import cv2
+from google.cloud import storage
+from inflection import underscore
+from requests import post, HTTPError
+
+from database import ResultDatabase, TemporaryDatabase
 from config import log, BASE_PATH, config
 
 

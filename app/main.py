@@ -1,5 +1,5 @@
-from app.video import CameraStreamOpenCV
-from app.analyzers.whistleblower import Whistleblower
+from video import CameraStreamOpenCV
+from analyzers.whistleblower import Whistleblower
 
 
 if __name__ == '__main__':

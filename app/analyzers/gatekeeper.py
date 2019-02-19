@@ -1,9 +1,9 @@
-from . import Analyzer
-from app.executors.open import GateOpener
-from config import log
 from json import loads
 
-from app.tools import format_whitelist_key
+from executors.open import GateOpener
+from tools import format_whitelist_key
+from config import log
+from . import Analyzer
 
 
 class Gatekeeper(Analyzer):

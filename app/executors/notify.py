@@ -1,5 +1,5 @@
-from . import Executor
 from config import log
+from . import Executor
 
 
 class PoliceNotifier(Executor):

@@ -1,11 +1,11 @@
-import cv2
-
 from abc import abstractmethod
-from openalpr import Alpr
 from math import ceil
 from os import environ
-from time import strftime
 from threading import Thread
+from time import strftime
+
+import cv2
+from openalpr import Alpr
 
 from config import log, BASE_PATH
 

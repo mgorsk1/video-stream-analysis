@@ -1,8 +1,9 @@
-from redis import Redis
-from json import dumps
-from elasticsearch import Elasticsearch, ElasticsearchException, NotFoundError
 from datetime import datetime, timedelta
+from json import dumps
 from ssl import create_default_context
+
+from elasticsearch import Elasticsearch, ElasticsearchException, NotFoundError
+from redis import Redis
 
 from config import log
 
