@@ -158,14 +158,13 @@ class Stream:
                     results, frame = self.analyze_frame(frame)
 
                 if self.display_frame:
-                    Stream.display(frame)
+                    self.display(frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-    @staticmethod
-    def display(frame):
-        cv2.imshow("frame", frame)
+    def display(self, frame):
+        cv2.imshow(self.window_name, frame)
 
 
 class CameraStreamOpenCV(Stream):
@@ -196,6 +195,11 @@ class CameraStreamOpenCV(Stream):
             self.desired_fps = camera_fps
 
         self.fps = ceil(camera_fps/self.desired_fps)
+
+        self.window_name = 'video-analysis'
+
+        cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
+        cv2.setWindowProperty(self.window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.camera.release()
