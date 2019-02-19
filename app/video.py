@@ -11,7 +11,7 @@ from config import log, BASE_PATH
 
 
 class Stream:
-    def __init__(self, desired_fps, precision, analyzer, **kwargs):
+    def __init__(self, desired_fps, precision, analyzer, display_frame=True, **kwargs):
         environ['TESSDATA_PREFIX'] = "{}/runtime/ocr/".format(BASE_PATH)
         environ['LD_LIBRARY_PATH'] = "/usr/include/"
 
@@ -21,6 +21,8 @@ class Stream:
         self.precision = precision
         self.analyzer = analyzer
         self.desired_fps = desired_fps
+
+        self.display_frame = display_frame
 
         self.levels = [0, 50, 90, 100]
         self.names = ['low', 'medium', 'high']
@@ -55,8 +57,7 @@ class Stream:
     def __enter__(self):
         self.run()
 
-    def analyze_frame(self):
-        res, frame = self.get_raw_frame()
+    def analyze_frame(self, frame):
         clean_frame = frame.copy()
 
         recognition = self.alpr.recognize_ndarray(frame)
@@ -150,13 +151,14 @@ class Stream:
         while True:
             i += 1
 
+            results, frame = self.get_raw_frame()
+
             if i % self.fps == 0:
                 if self.analyzer:
-                    results, frame = self.analyze_frame()
-                else:
-                    results, frame = self.get_raw_frame()
+                    results, frame = self.analyze_frame(frame)
 
-                Stream.display(frame)
+                if self.display_frame:
+                    Stream.display(frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
