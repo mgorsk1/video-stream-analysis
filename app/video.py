@@ -190,7 +190,12 @@ class CameraStreamOpenCV(Stream):
 
         self.metadata.update(dict(camera=camera_metadata))
 
-        self.fps = ceil(self.camera.get(cv2.CAP_PROP_FPS) / self.desired_fps)
+        camera_fps = self.camera.get(cv2.CAP_PROP_FPS)
+
+        if self.desired_fps >= camera_fps:
+            self.desired_fps = camera_fps
+
+        self.fps = ceil(camera_fps/self.desired_fps)
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.camera.release()
