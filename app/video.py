@@ -150,12 +150,12 @@ class Stream:
         while True:
             i += 1
 
-            if self.analyzer:
-                results, frame = self.analyze_frame()
-            else:
-                results, frame = self.get_raw_frame()
-
             if i % self.fps == 0:
+                if self.analyzer:
+                    results, frame = self.analyze_frame()
+                else:
+                    results, frame = self.get_raw_frame()
+
                 Stream.display(frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
