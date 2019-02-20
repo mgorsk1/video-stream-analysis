@@ -1,10 +1,10 @@
-def format_plate_active(plate):
-    return ':'.join([plate, 'Y'])
+def format_value_active(value):
+    return ':'.join([value, 'Y'])
 
 
-def format_plate_inactive(plate):
-    return ':'.join([plate, 'N'])
+def format_value_inactive(value):
+    return ':'.join([value, 'N'])
 
 
-def format_whitelist_key(plate):
-    return ':'.join(['whitelist', plate])
+def format_whitelist_key(value):
+    return ':'.join(['whitelist', value])

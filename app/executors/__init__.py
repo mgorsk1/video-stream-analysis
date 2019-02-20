@@ -42,38 +42,38 @@ class Executor:
             log.info("#created public #gcp #bucket", extra=dict(bucket=self.index_name))
 
     @abstractmethod
-    def action(self, plate, confidence, image, **kwargs):
+    def action(self, value, confidence, image, **kwargs):
         raise NotImplementedError
 
-    def run(self, plate, confidence, image, **kwargs):
+    def run(self, value, confidence, image, **kwargs):
         run_uuid = uuid4()
 
         value = dumps(dict(time_added=time(), confidence=confidence)).encode('utf-8')
 
         if self.reset_after <= 0:
-            self.tdb.set_key(plate + ':Y', value)
+            self.tdb.set_key(value + ':Y', value)
         else:
-            self.tdb.set_key(plate+':Y', value, ex=self.reset_after)
+            self.tdb.set_key(value + ':Y', value, ex=self.reset_after)
 
-        self.take_action(plate, confidence, image, run_uuid, **dict(kwargs))
+        self.take_action(value, confidence, image, run_uuid, **dict(kwargs))
 
-    def take_action(self, plate, confidence, image, uuid, **kwargs):
-        if not self.rdb.check_if_exists('plate', plate, self.reset_after, False):
-            log.info("#plate does not exist in result #database", extra=dict(plate=plate))
-            if not self.rdb.check_if_exists('plate', plate, self.reset_after, True):
-                log.info("#similar #plate does not exist in result #database", extra=dict(plate=plate))
-                if not self.rdb.check_if_exists('candidates', plate, self.reset_after, False):
-                    log.info("#plate does not exist amongst candidates in #database", extra=dict(plate=plate))
+    def take_action(self, value, confidence, image, uuid, **kwargs):
+        if not self.rdb.check_if_exists('value', value, self.reset_after, False):
+            log.info("#value does not exist in result #database", extra=dict(value=value))
+            if not self.rdb.check_if_exists('value', value, self.reset_after, True):
+                log.info("#similar #value does not exist in result #database", extra=dict(value=value))
+                if not self.rdb.check_if_exists('candidates', value, self.reset_after, False):
+                    log.info("#value does not exist amongst candidates in #database", extra=dict(value=value))
 
-                    self.action(plate, confidence, image, uuid, **dict(kwargs))
+                    self.action(value, confidence, image, uuid, **dict(kwargs))
 
-                    log.info("#notification send about plate", extra=dict(plate=plate, confidence=confidence))
+                    log.info("#notification send about value", extra=dict(value=value, confidence=confidence))
                 else:
-                    log.info("#plate existed amongst candidates in #database", extra=dict(plate=plate))
+                    log.info("#value existed amongst candidates in #database", extra=dict(value=value))
             else:
-                log.info("#plate matched another #similar plate in #database", extra=dict(plate=plate))
+                log.info("#value matched another #similar value in #database", extra=dict(value=value))
         else:
-            log.info("#plate existed in #database", extra=dict(plate=plate))
+            log.info("#value existed in #database", extra=dict(value=value))
 
         pass
 
@@ -121,10 +121,10 @@ class Executor:
 
         return result
 
-    def save_image_to_gcp(self, plate, image, uuid):
-        tmp_file = Executor.save_image_locally(plate, image, uuid, 'tmp', 'png')
+    def save_image_to_gcp(self, value, image, uuid):
+        tmp_file = Executor.save_image_locally(value, image, uuid, 'tmp', 'png')
 
-        filename = "{}_{}.png".format(plate, uuid)
+        filename = "{}_{}.png".format(value, uuid)
 
         blob = self.bucket.blob(filename)
 
@@ -139,8 +139,8 @@ class Executor:
         return blob.public_url
 
     @staticmethod
-    def save_image_locally(plate, image, uuid, folder, ext):
-        filename = "{}_{}.{}".format(plate, uuid, ext)
+    def save_image_locally(value, image, uuid, folder, ext):
+        filename = "{}_{}.{}".format(value, uuid, ext)
 
         full_path = "{}/{}/{}".format(BASE_PATH, folder, filename)
 

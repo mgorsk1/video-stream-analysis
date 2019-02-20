@@ -113,15 +113,15 @@ class ResultDatabase:
         else:
             return False
 
-    def index_result(self, plate, confidence, id, **kwargs):
-        body = dict(plate=plate, confidence=confidence)
+    def index_result(self, value, confidence, id, **kwargs):
+        body = dict(value=value, confidence=confidence)
         body['@timestamp'] = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')
 
         body.update(dict(kwargs))
 
         self.db.index(self.index, 'default', body, id=id)
 
-        log.info('#indexed doc for plate', extra=dict(plate=plate, confidence=confidence, id=id))
+        log.info('#indexed doc', extra=dict(value=value, confidence=confidence, id=id))
 
         self.db.indices.refresh(self.index)
 

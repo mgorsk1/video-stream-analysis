@@ -15,24 +15,24 @@ class Gatekeeper(Analyzer):
         whitelist = dict(kwargs).get('whitelist')
 
         if whitelist:
-            for plate in whitelist:
-                self.tdb.set_key(format_whitelist_key(plate), 'whitelisted')
+            for value in whitelist:
+                self.tdb.set_key(format_whitelist_key(value), 'whitelisted')
 
-    def process(self, plate, confidence, image, **kwargs):
+    def process(self, value, confidence, image, **kwargs):
         # check if gate already opened
         #   if yes - do nothing
-        #   if no - check if plate in database
+        #   if no - check if value in database
         #       if yes - open the gate, wait n-seconds, close the gate
         #       if no - do nothing
 
         gate_open = self.tdb.get_key('gate:open')
 
         if not gate_open:
-            license_plate_allowed = self.tdb.get_key(format_whitelist_key(plate))
+            license_value_allowed = self.tdb.get_key(format_whitelist_key(value))
 
-            if license_plate_allowed:
-                self.executor.run(plate, confidence, image, **dict(kwargs))
+            if license_value_allowed:
+                self.executor.run(value, confidence, image, **dict(kwargs))
             else:
-                log.warning('#plate not in the #whitelist', extra=dict(plate=plate))
+                log.warning('#value not in the #whitelist', extra=dict(value=value))
         else:
             log.warning('#gate already #opened', extra=dict(loads(gate_open)))
