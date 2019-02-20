@@ -48,12 +48,12 @@ class Executor:
     def run(self, value, confidence, image, **kwargs):
         run_uuid = uuid4()
 
-        value = dumps(dict(time_added=time(), confidence=confidence)).encode('utf-8')
+        attributes = dumps(dict(time_added=time(), confidence=confidence)).encode('utf-8')
 
         if self.reset_after <= 0:
-            self.tdb.set_key(value + ':Y', value)
+            self.tdb.set_key(value + ':Y', attributes)
         else:
-            self.tdb.set_key(value + ':Y', value, ex=self.reset_after)
+            self.tdb.set_key(value + ':Y', attributes, ex=self.reset_after)
 
         self.take_action(value, confidence, image, run_uuid, **dict(kwargs))
 

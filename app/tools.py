@@ -1,10 +1,10 @@
-def format_value_active(value):
-    return ':'.join([value, 'Y'])
+def format_key_active(key):
+    return ':'.join([key, 'Y'])
 
 
-def format_value_inactive(value):
-    return ':'.join([value, 'N'])
+def format_key_inactive(key):
+    return ':'.join([key, 'N'])
 
 
-def format_whitelist_key(value):
-    return ':'.join(['whitelist', value])
+def format_whitelist_key(key):
+    return ':'.join(['whitelist', key])

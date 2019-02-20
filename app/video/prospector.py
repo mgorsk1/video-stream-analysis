@@ -106,10 +106,10 @@ class LicensePlateProspector(Prospector):
 
         if len(results) > 0:
             for result in results:
-                value, confidence = result.get('value'), result.get('confidence')
+                value, confidence = result.get('plate'), result.get('confidence')
 
                 if confidence > self.precision:
-                        candidates = [x.get('value') for x in result.get('candidates')]
+                    candidates = [x.get('plate') for x in result.get('candidates')]
 
                         x1 = min([c.get('x') for c in result['coordinates']])
                         x2 = max([c.get('x') for c in result['coordinates']])
@@ -119,7 +119,7 @@ class LicensePlateProspector(Prospector):
 
                         coordinates = [(x1, y1), (x2, y2)]
 
-                        value, confidence = result['candidates'][0].get('value'), result['candidates'][0].get('confidence')
+                    value, confidence = result['candidates'][0].get('plate'), result['candidates'][0].get('confidence')
 
                         result_set.append(dict(coordinates=coordinates,
                                                value=value,

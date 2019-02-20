@@ -2,7 +2,7 @@ from json import loads
 from time import time
 
 from app.executors.notify import PoliceNotifier
-from app.tools import format_value_active, format_value_inactive
+from app.tools import format_key_active, format_key_inactive
 from . import Analyzer
 
 
@@ -21,10 +21,10 @@ class Whistleblower(Analyzer):
         #       if no - add to redis
         #   if yes - do nothing
 
-        already_filed = self.tdb.get_key(format_value_active(value))
+        already_filed = self.tdb.get_key(format_key_active(value))
 
         if not already_filed:
-            already_detected = self.tdb.get_key(format_value_inactive(value))
+            already_detected = self.tdb.get_key(format_key_inactive(value))
 
             if already_detected:
 
@@ -38,7 +38,7 @@ class Whistleblower(Analyzer):
                 if time_passed > self.grace_period:
                     self.executor.run(value, confidence, image, **dict(kwargs))
             else:
-                self.tdb.set_key(format_value_inactive(value),
+                self.tdb.set_key(format_key_inactive(value),
                                  dict(confidence=confidence, value=value,
                                       time_added=time()),
                                  ex=self.grace_period+60)
