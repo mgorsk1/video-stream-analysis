@@ -79,8 +79,9 @@ class CameraStreamOpenCV(Stream):
 
         self.window_name = 'video-analysis'
 
-        cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
-        cv2.setWindowProperty(self.window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+        if self.display_frame:
+            cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
+            cv2.setWindowProperty(self.window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.camera.release()
