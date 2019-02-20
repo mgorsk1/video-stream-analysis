@@ -48,6 +48,8 @@ COPY . /app/
 
 WORKDIR /app
 
+ENV PYTHONPATH /app/:$PYTHONPATH
+
 # Install dependencies
 RUN pip3 install -r requirements.txt
 
