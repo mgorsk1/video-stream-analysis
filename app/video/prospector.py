@@ -36,8 +36,8 @@ class Prospector:
         if len(self.levels) != len(self.names) + 1:
             return ""
 
-        for i in range(len(self.levels)-1):
-            if value > self.levels[i] and value <= self.levels[i+1]:
+        for i in range(len(self.levels) - 1):
+            if value > self.levels[i] and value <= self.levels[i + 1]:
                 result = self.names[i]
                 break
 
@@ -51,25 +51,16 @@ class Prospector:
         # mark found area
         cv2.rectangle(frame, upper_left, bottom_right, self.lineColors.get(conf_level), 2)
 
-        info_to_print = ['Date: ' + strftime('%Y/%m/%d %H:%M:%S'),
-                         'Result: ' + str(value),
+        info_to_print = ['Date: ' + strftime('%Y/%m/%d %H:%M:%S'), 'Result: ' + str(value),
                          'Confidence: ' + str(round(confidence, 3)) + '%']
 
         # background for text
-        cv2.rectangle(frame,
-                      (upper_left[0], upper_left[1] + 5),
-                      (upper_left[0] + 230, upper_left[1] + 5 + (len(info_to_print) * 20)),
-                      (255, 255, 255),
-                      -1)
+        cv2.rectangle(frame, (upper_left[0], upper_left[1] + 5),
+                      (upper_left[0] + 230, upper_left[1] + 5 + (len(info_to_print) * 20)), (255, 255, 255), -1)
 
         for i, info in enumerate(info_to_print):
-            cv2.putText(frame,
-                        str(info),
-                        (upper_left[0], upper_left[1] + 20 + (i * 20)),
-                        self.font,
-                        self.fontScale,
-                        (0, 0, 0),
-                        self.lineType)
+            cv2.putText(frame, str(info), (upper_left[0], upper_left[1] + 20 + (i * 20)), self.font, self.fontScale,
+                        (0, 0, 0), self.lineType)
 
         return frame
 
@@ -111,20 +102,18 @@ class LicensePlateProspector(Prospector):
                 if confidence > self.precision:
                     candidates = [x.get('plate') for x in result.get('candidates')]
 
-                        x1 = min([c.get('x') for c in result['coordinates']])
-                        x2 = max([c.get('x') for c in result['coordinates']])
+                    x1 = min([c.get('x') for c in result['coordinates']])
+                    x2 = max([c.get('x') for c in result['coordinates']])
 
-                        y1 = max([c.get('y') for c in result['coordinates']])
-                        y2 = min([c.get('y') for c in result['coordinates']])
+                    y1 = max([c.get('y') for c in result['coordinates']])
+                    y2 = min([c.get('y') for c in result['coordinates']])
 
-                        coordinates = [(x1, y1), (x2, y2)]
+                    coordinates = [(x1, y1), (x2, y2)]
 
                     value, confidence = result['candidates'][0].get('plate'), result['candidates'][0].get('confidence')
 
-                        result_set.append(dict(coordinates=coordinates,
-                                               value=value,
-                                               confidence=confidence,
-                                               candidates=candidates))
+                    result_set.append(
+                        dict(coordinates=coordinates, value=value, confidence=confidence, candidates=candidates))
 
         for result in result_set:
             image = clean_frame.copy()
@@ -154,7 +143,8 @@ class PeopleProspector(Prospector):
     def __init__(self, *args, **kwargs):
         super(PeopleProspector, self).__init__(*args, **kwargs)
 
-        self.face_classifier = cv2.CascadeClassifier('{}/resources/cascades/data/haarcascade_frontalface_alt2.xml'.format(BASE_PATH))
+        self.face_classifier = cv2.CascadeClassifier(
+            '{}/resources/cascades/data/haarcascade_frontalface_alt2.xml'.format(BASE_PATH))
 
         self.recognizer = cv2.face.LBPHFaceRecognizer_create()
         self.recognizer.read("{}/resources/recognizers/face-trainner.yml".format(BASE_PATH))
@@ -186,18 +176,14 @@ class PeopleProspector(Prospector):
             conf_level = self.find_level(conf)
 
             if conf >= self.precision:
-                frame = self.format_result(frame, value, conf, (x, x+w), (y, y+h))
+                frame = self.format_result(frame, value, conf, (x, x + w), (y, y + h))
 
                 result_set.append(dict(value=value, confidence=conf))
 
             stroke = 2
             end_cord_x = x + w
             end_cord_y = y + h
-            cv2.rectangle(frame,
-                          (x, y),
-                          (end_cord_x, end_cord_y),
-                          self.lineColors.get(conf_level),
-                          stroke)
+            cv2.rectangle(frame, (x, y), (end_cord_x, end_cord_y), self.lineColors.get(conf_level), stroke)
 
             self.pass_to_analyze(value, conf, frame)
 
