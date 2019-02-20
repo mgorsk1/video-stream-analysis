@@ -1,8 +1,8 @@
 from json import loads
 from time import time
 
-from executors.notify import PoliceNotifier
-from tools import format_plate_active, format_plate_inactive
+from app.executors.notify import PoliceNotifier
+from app.tools import format_plate_active, format_plate_inactive
 from . import Analyzer
 
 
@@ -10,7 +10,7 @@ class Whistleblower(Analyzer):
     def __init__(self, *args, **kwargs):
         super(Whistleblower, self).__init__(*args, **kwargs)
 
-        self.executor = PoliceNotifier(8*60*60)
+        self.executor = PoliceNotifier(self.reset_after)
 
     def process(self, plate, confidence, image, **kwargs):
         # check if already notified about plate

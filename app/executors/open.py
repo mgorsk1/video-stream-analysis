@@ -1,7 +1,7 @@
 from json import dumps
 from time import time, sleep
 
-from config import log
+from app.config import log
 from . import Executor
 
 

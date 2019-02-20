@@ -1,8 +1,8 @@
 from json import loads
 
-from executors.open import GateOpener
-from tools import format_whitelist_key
-from config import log
+from app.executors.open import GateOpener
+from app.tools import format_whitelist_key
+from app.config import log
 from . import Analyzer
 
 
@@ -10,7 +10,7 @@ class Gatekeeper(Analyzer):
     def __init__(self, *args, **kwargs):
         super(Gatekeeper, self).__init__(*args, **kwargs)
 
-        self.executor = GateOpener(3*60)
+        self.executor = GateOpener(self.reset_after)
 
         whitelist = dict(kwargs).get('whitelist')
 

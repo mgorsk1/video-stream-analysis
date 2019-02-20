@@ -1,4 +1,4 @@
-from logger import prepare
+from .logger import prepare
 from os import path,  getenv
 from json import loads
 

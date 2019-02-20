@@ -9,8 +9,8 @@ from google.cloud import storage
 from inflection import underscore
 from requests import post, HTTPError
 
-from database import ResultDatabase, TemporaryDatabase
-from config import log, BASE_PATH, config
+from app.database import ResultDatabase, TemporaryDatabase
+from app.config import log, BASE_PATH, config
 
 
 class Executor:

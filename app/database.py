@@ -4,8 +4,10 @@ from ssl import create_default_context
 
 from elasticsearch import Elasticsearch, ElasticsearchException, NotFoundError
 from redis import Redis
+from sys import exit
 
-from config import log
+
+from app.config import log
 
 
 class TemporaryDatabase:

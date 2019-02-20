@@ -5,7 +5,7 @@
       "format": "%(asctime)s %(levelname)s %(process)d %(threadName)s %(module)s %(funcName)s %(lineno)s %(message)s"
     },
     "json": {
-      "()": "logger.CustomJsonFormatter",
+      "()": "app.logger.CustomJsonFormatter",
       "format": "(levelname) (name) (process) (processName) (message) (threadName) (thread) (lineno) (module) (funcName)"
     }
   },
