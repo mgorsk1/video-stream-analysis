@@ -55,11 +55,11 @@ class Prospector:
                          'Confidence: ' + str(round(confidence, 3)) + '%']
 
         # background for text
-        cv2.rectangle(frame, (upper_left[0], upper_left[1] + 5),
-                      (upper_left[0] + 230, upper_left[1] + 5 + (len(info_to_print) * 20)), (255, 255, 255), -1)
+        cv2.rectangle(frame, (upper_left[0], bottom_right[1] + 5),
+                      (upper_left[0] + 230, bottom_right[1] + 5 + (len(info_to_print) * 20)), (255, 255, 255), -1)
 
         for i, info in enumerate(info_to_print):
-            cv2.putText(frame, str(info), (upper_left[0], upper_left[1] + 20 + (i * 20)), self.font, self.fontScale,
+            cv2.putText(frame, str(info), (upper_left[0], bottom_right[1] + 20 + (i * 20)), self.font, self.fontScale,
                         (0, 0, 0), self.lineType)
 
         return frame
@@ -176,14 +176,9 @@ class PeopleProspector(Prospector):
             conf_level = self.find_level(conf)
 
             if conf >= self.precision:
-                frame = self.format_result(frame, value, conf, (x, x + w), (y, y + h))
+                frame = self.format_result(frame, value, conf, (x, y), (x + w, y + h))
 
                 result_set.append(dict(value=value, confidence=conf))
-
-            stroke = 2
-            end_cord_x = x + w
-            end_cord_y = y + h
-            cv2.rectangle(frame, (x, y), (end_cord_x, end_cord_y), self.lineColors.get(conf_level), stroke)
 
             self.pass_to_analyze(value, conf, frame)
 
