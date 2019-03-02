@@ -147,7 +147,7 @@ class PeopleProspector(Prospector):
             '{}/resources/cascades/data/haarcascade_frontalface_alt2.xml'.format(BASE_PATH))
 
         self.recognizer = cv2.face.LBPHFaceRecognizer_create()
-        self.recognizer.read("{}/resources/recognizers/face-trainner.yml".format(BASE_PATH))
+        self.recognizer.read("{}/resources/recognizers/face-trainer.yml".format(BASE_PATH))
 
         self.labels = dict()
 
