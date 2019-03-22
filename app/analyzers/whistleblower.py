@@ -3,16 +3,17 @@ from time import time
 
 from app.executors.notify import PoliceNotifier
 from app.tools import format_key_active, format_key_inactive
+from app.config import log
 from . import Analyzer
 
 
-class Whistleblower(Analyzer):
+class Whistleblower(PoliceNotifier, Analyzer):
     def __init__(self, *args, **kwargs):
         super(Whistleblower, self).__init__(*args, **kwargs)
 
-        self.executor = PoliceNotifier(self.reset_after)
+        Analyzer.__init__(self, dict(kwargs).get('grace_period'), 8 * 60 * 60)
 
-    def process(self, value, confidence, image, **kwargs):
+    def analyze(self, value, confidence, image, **kwargs):
         # check if already notified about value
         #   if not - check if already detected value
         #       if yes - check value whether it's within its grace_period
@@ -20,11 +21,12 @@ class Whistleblower(Analyzer):
         #           if no - skip
         #       if no - add to redis
         #   if yes - do nothing
+        log.info("performing #analysis", extra=dict(value=value, confidence=confidence))
 
-        already_filed = self.tdb.get_key(format_key_active(value))
+        already_filed = self.tdb.get_val(format_key_active(value))
 
         if not already_filed:
-            already_detected = self.tdb.get_key(format_key_inactive(value))
+            already_detected = self.tdb.get_val(format_key_inactive(value))
 
             if already_detected:
 
@@ -36,10 +38,11 @@ class Whistleblower(Analyzer):
                 time_passed = now - time_added
 
                 if time_passed > self.grace_period:
-                    self.executor.run(value, confidence, image, **dict(kwargs))
+                    self.take_action(value, confidence, image, **dict(kwargs))
             else:
-                self.tdb.set_key(format_key_inactive(value),
+                self.tdb.set_val(format_key_inactive(value),
                                  dict(confidence=confidence, value=value,
                                       time_added=time()),
                                  ex=self.grace_period+60)
-
+        else:
+            log.info("detection already filed", extra=dict(value=value))

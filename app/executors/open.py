@@ -11,33 +11,31 @@ class GateOpener(Executor):
 
         self.open_time = 120
 
-    def action(self, value, confidence, image, uuid, **kwargs):
-        self.open_gate(value)
+    def _action(self, value, confidence, image, uuid, **kwargs):
+        file = super(GateOpener, self)._action(value, confidence, image, uuid)
 
-        self.save_image(value, image, uuid)
-
-        self.rdb.index_result(value, confidence, uuid, **dict(kwargs))
+        self._open_gate(value)
 
         sleep(self.open_time)
 
-        self.close_gate(value)
+        self._close_gate(value)
 
-    def open_gate(self, value):
+    def _open_gate(self, value):
         data = dict(timestamp=time(), value=value)
 
-        self.tdb.set_key('gate:open', dumps(data))
+        self.tdb.set_val('gate:open', dumps(data))
 
         # @todo below actually trigger opening gate
 
         log.info("#gate opened for #vehicle", extra=dict(value=value))
 
-    def close_gate(self, value):
+    def _close_gate(self, value):
         data = dict(timestamp=time(), value=value)
 
-        self.tdb.delete_key('gate:open')
+        self.tdb.del_val('gate:open')
 
         # @todo below actually trigger closing gate
 
-        self.tdb.set_key('gate:close', dumps(data))
+        self.tdb.set_val('gate:close', dumps(data))
 
         log.info("#gate closed", extra=dict(value=value))

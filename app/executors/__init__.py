@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from json import dumps
 from os import getenv, environ, remove
 from time import time
@@ -14,58 +13,52 @@ from app.config import log, BASE_PATH, config
 
 
 class Executor:
-    def __init__(self, reset_after):
-        environ['GOOGLE_APPLICATION_CREDENTIALS'] = "{}/config/gcp/key.json".format(BASE_PATH)
+    save_file_function = 'save_image_to_gcp'
 
+    def __init__(self, reset_after, **kwargs):
         self.reset_after = reset_after
 
-        self.index_name = underscore(self.__class__.__name__)
+        self.bucket_folder_name = underscore(self.__class__.__name__)
+        self.index = 'video-analysis-{}'.format(self.bucket_folder_name)
+
         self.rdb = ResultDatabase(config.get('RDB_HOST'),
-                                  config.get('RDB_PORT'),
-                                  self.index_name,
+                                  config.get('RDB_PORT'), self.index,
                                   **dict(db_user=config.get('RDB_USER'),
                                          db_pass=getenv('RDB_PASS'),
                                          db_scheme=config.get('RDB_SCHEME')))
 
         self.tdb = TemporaryDatabase(config.get('TDB_HOST'), config.get('TDB_PORT'), **dict(db_pass=getenv('TDB_PASS')))
 
-        self.pushover_config = dict(APP_TOKEN=getenv("PUSHOVER_APP_TOKEN"), USER_KEY=getenv("PUSHOVER_USER_KEY"))
+        self.save_file = None
 
-        client = Executor._get_storage_client()
+        self.bucket = None
 
-        self.bucket = client.bucket(self.index_name)
+        self.pushover_config = None
 
-        if not self.bucket.exists():
-            self.bucket.create()
-            self.bucket.make_public(recursive=True, future=True)
-
-            log.info("#created public #gcp #bucket", extra=dict(bucket=self.index_name))
-
-    @abstractmethod
-    def action(self, value, confidence, image, **kwargs):
-        raise NotImplementedError
-
-    def run(self, value, confidence, image, **kwargs):
+    def take_action(self, value, confidence, image, **kwargs):
         run_uuid = uuid4()
 
         attributes = dumps(dict(time_added=time(), confidence=confidence)).encode('utf-8')
 
         if self.reset_after <= 0:
-            self.tdb.set_key(value + ':Y', attributes)
+            self.tdb.set_val(value + ':Y', attributes)
         else:
-            self.tdb.set_key(value + ':Y', attributes, ex=self.reset_after)
+            self.tdb.set_val(value + ':Y', attributes, ex=self.reset_after)
 
-        self.take_action(value, confidence, image, run_uuid, **dict(kwargs))
+        self.action(value, confidence, image, run_uuid, **dict(kwargs))
 
-    def take_action(self, value, confidence, image, uuid, **kwargs):
-        if not self.rdb.check_if_exists('value', value, self.reset_after, False):
+    def action(self, value, confidence, image, uuid, **kwargs):
+        exact_match = self.rdb.get_val(value, field='value', ago=self.reset_after, fuzzy=False)
+        if exact_match is None:
             log.info("#value does not exist in result #database", extra=dict(value=value))
-            if not self.rdb.check_if_exists('value', value, self.reset_after, True):
+            fuzzy_match = self.rdb.get_val(value, field='value', ago=self.reset_after, fuzzy=False)
+            if fuzzy_match is None:
                 log.info("#similar #value does not exist in result #database", extra=dict(value=value))
-                if not self.rdb.check_if_exists('candidates', value, self.reset_after, False):
+                candidates_match = self.rdb.get_val(value, field='candidates', ago=self.reset_after, fuzzy=False)
+                if candidates_match is None:
                     log.info("#value does not exist amongst candidates in #database", extra=dict(value=value))
 
-                    self.action(value, confidence, image, uuid, **dict(kwargs))
+                    self._action(value, confidence, image, uuid, **dict(kwargs))
 
                     log.info("#notification send about value", extra=dict(value=value, confidence=confidence))
                 else:
@@ -77,7 +70,26 @@ class Executor:
 
         pass
 
-    def notify_pushover(self, title, message, url):
+    def save_image_to_gcp(self, value, image, uuid):
+        if self.bucket is None:
+            self._setup_gcp()
+
+        tmp_file = Executor.save_image_locally(value, image, uuid, 'tmp', 'png')
+
+        filename = "{}_{}.png".format(value, uuid)
+
+        blob = self.bucket.blob('{}/{}'.format(self.bucket_folder_name, filename))
+
+        blob.upload_from_filename(tmp_file, content_type="image/png")
+
+        remove(tmp_file)
+
+        log.info("#image sent to #gcp #bucket",
+                 extra=dict(gcp=dict(bucket=self.index, fileName=filename, publicUrl=blob.public_url)))
+
+        return blob.public_url
+
+    def notify(self, title, message, url):
         """
         Send request to pushover_notify API with data:
 
@@ -99,6 +111,9 @@ class Executor:
         :param url: optional url to pass
         :return: -
         """
+        if self.pushover_config is None:
+            self._setup_pushover()
+
         result = None
         device = "video-analysis"
 
@@ -121,22 +136,30 @@ class Executor:
 
         return result
 
-    def save_image_to_gcp(self, value, image, uuid):
-        tmp_file = Executor.save_image_locally(value, image, uuid, 'tmp', 'png')
+    def _action(self, value, confidence, image, uuid, **kwargs):
+        file = getattr(self, self.save_file_function)(value, image, uuid)
 
-        filename = "{}_{}.png".format(value, uuid)
+        self.rdb.set_val(uuid, dict(value=value, confidence=confidence), **dict(kwargs))
 
-        blob = self.bucket.blob(filename)
+        return file
 
-        blob.upload_from_filename(tmp_file, content_type="image/png")
+    def _setup_rdb(self):
+        self.rdb.init()
 
-        remove(tmp_file)
+    def _setup_gcp(self):
+        environ['GOOGLE_APPLICATION_CREDENTIALS'] = "{}/config/gcp/key.json".format(BASE_PATH)
 
-        log.info("#image sent to #gcp #bucket", extra=dict(gcp=dict(bucket=self.index_name,
-                                                                    fileName=filename,
-                                                                    publicUrl=blob.public_url)))
+        client = Executor._get_storage_client()
 
-        return blob.public_url
+        self.bucket = client.bucket('video-analysis-file')
+
+        try:
+            self.bucket.make_public(recursive=True, future=True)
+        except:
+            pass
+
+    def _setup_pushover(self):
+        self.pushover_config = dict(APP_TOKEN=getenv("PUSHOVER_APP_TOKEN"), USER_KEY=getenv("PUSHOVER_USER_KEY"))
 
     @staticmethod
     def save_image_locally(value, image, uuid, folder, ext):

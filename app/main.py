@@ -1,5 +1,5 @@
 from app.video.streamer import CameraStreamOpenCV
-from app.video.prospector import  LicensePlateProspector
+from app.video.prospector import LicensePlateProspector, PeopleProspector
 from app.analyzers.whistleblower import Whistleblower
 
 
@@ -7,12 +7,13 @@ def run():
     camera_url = -1
     # camera_url = 'http://195.1.188.76/mjpg/video.mjpg'
 
-    interpreter = LicensePlateProspector(90, Whistleblower(5, 8*60*60))
+    interpreter = LicensePlateProspector(60, Whistleblower(8 * 60 * 60, grace_period=5))
 
     additional_data = dict(camera_url=camera_url, general=dict(model='HP', id=17, location='Radom'))
 
-    with CameraStreamOpenCV(30, interpreter, **additional_data) as stream:
-        pass
+    stream = CameraStreamOpenCV(30, interpreter, True, **additional_data)
+
+    stream.run()
 
 
 if __name__ == '__main__':

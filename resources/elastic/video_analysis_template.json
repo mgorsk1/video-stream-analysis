@@ -1,0 +1,41 @@
+{
+  "index_patterns": [
+    "video-analysis-*"
+  ],
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "number_of_replicas": 1
+    }
+  },
+  "mappings": {
+    "default": {
+      "_meta": {
+        "version": "1.0.0"
+      },
+      "date_detection": true,
+      "dynamic_date_formats": [
+        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+        "yyyy-MM-dd HH:mm:ss.SSSSSS"
+      ],
+      "dynamic_templates": [
+        {
+          "strings": {
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "keyword"
+            }
+          }
+        }
+      ],
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        }
+      }
+    }
+  }
+}
+
+
+

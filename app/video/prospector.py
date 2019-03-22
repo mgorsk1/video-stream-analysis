@@ -54,18 +54,26 @@ class Prospector:
         info_to_print = ['Date: ' + strftime('%Y/%m/%d %H:%M:%S'), 'Result: ' + str(value),
                          'Confidence: ' + str(round(confidence, 3)) + '%']
 
+        frame_upper_left = upper_left
+        frame_bottom_right = (upper_left[0] + 230, upper_left[1] + (20 * len(info_to_print)) + 5)
+
+        print('format', upper_left, bottom_right)
+        print('frame', frame_upper_left, frame_bottom_right)
+
         # background for text
-        cv2.rectangle(frame, (upper_left[0], bottom_right[1] + 5),
-                      (upper_left[0] + 230, bottom_right[1] + 5 + (len(info_to_print) * 20)), (255, 255, 255), -1)
+        cv2.rectangle(frame, frame_upper_left, frame_bottom_right, (255, 255, 255), -1)
 
         for i, info in enumerate(info_to_print):
-            cv2.putText(frame, str(info), (upper_left[0], bottom_right[1] + 20 + (i * 20)), self.font, self.fontScale,
+            cv2.putText(frame, str(info), (upper_left[0], upper_left[1] + 20 + (i * 20)), self.font, self.fontScale,
                         (0, 0, 0), self.lineType)
 
         return frame
 
     def pass_to_analyze(self, value, conf, image, **kwargs):
-        t = Thread(target=self.analyzer.process, args=(value, conf, image,), kwargs=dict(kwargs))
+        log.info("starting thread for #analysis of #image",
+                 extra=dict(target=self.analyzer.analyze, args=(value, conf, image)))
+
+        t = Thread(target=self.analyzer.analyze, args=(value, conf, image,), kwargs=dict(kwargs))
 
         t.start()
 
@@ -125,6 +133,8 @@ class LicensePlateProspector(Prospector):
             cord1 = result.get('coordinates')[0]
             cord2 = result.get('coordinates')[1]
 
+            print(cord1, cord2)
+
             candidates = result.get('candidates')
 
             frame = self.format_result(frame, value, conf, cord1, cord2)
@@ -176,10 +186,10 @@ class PeopleProspector(Prospector):
             conf_level = self.find_level(conf)
 
             if conf >= self.precision:
-                frame = self.format_result(frame, value, conf, (x, y), (x + w, y + h))
+                frame = self.format_result(frame, value, conf, (x, y + h), (x + w, y))
 
                 result_set.append(dict(value=value, confidence=conf))
 
-            self.pass_to_analyze(value, conf, frame)
+                self.pass_to_analyze(value, conf, frame)
 
         return result_set, frame

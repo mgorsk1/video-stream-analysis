@@ -14,5 +14,5 @@ class Analyzer:
         self.tdb = TemporaryDatabase(config.get('TDB_HOST'), config.get('TDB_PORT'), **dict(db_pass=getenv('TDB_PASS')))
 
     @abstractmethod
-    def process(self):
+    def analyze(self):
         raise NotImplementedError
