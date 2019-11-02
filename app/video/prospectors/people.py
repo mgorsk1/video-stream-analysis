@@ -51,7 +51,7 @@ class PeopleProspector(BaseProspector):
             conf_level = self.find_level(conf)
 
             if conf >= self.precision:
-                frame = self.format_result(frame, value, conf, (x, y + h), (x + w, y))
+                frame = self.format_result(frame, value, conf_level, (x, y + h), (x + w, y))
 
                 result_set.append(dict(value=value, confidence=conf))
 
