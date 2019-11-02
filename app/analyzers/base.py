@@ -9,6 +9,13 @@ __all__ = ['BaseAnalyzer']
 
 
 class BaseAnalyzer(ABC):
+    """
+    BaseAnalyzer is used for defining behaviour taken when object detection is made (search function).
+
+    It's default action is to log occurrence.
+
+
+    """
     def __init__(self, *args, **kwargs):
         super(BaseAnalyzer, self).__init__(*args, **kwargs)
         # in seconds
@@ -36,6 +43,9 @@ class BaseAnalyzer(ABC):
             self.analyze(value, confidence, image, **metadata)
 
         return results, frame
+
+    def take_action(*args, **kwargs):
+        log.info("Take action called. Received data:", extras=dict(args=args, kwargs=kwargs))
 
     @abstractmethod
     def _analyze(self, value: str, confidence: float, image, **kwargs) -> None:

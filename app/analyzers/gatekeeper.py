@@ -2,13 +2,12 @@ from json import loads
 
 from app.analyzers.base import BaseAnalyzer
 from app.config import log
-from app.executors.open import GateOpener
 from app.tools import format_whitelist_key
 
 __all__ = ['Gatekeeper']
 
 
-class Gatekeeper(GateOpener, BaseAnalyzer):
+class Gatekeeper(BaseAnalyzer):
     def __init__(self, *args, **kwargs):
         super(Gatekeeper, self).__init__(*args, **kwargs)
 

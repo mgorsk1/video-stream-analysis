@@ -6,12 +6,12 @@ from app.config import log
 from app.executors.notify import PoliceNotifier
 from app.tools import format_key_active, format_key_inactive
 
-__all__ = ['PoliceWhistleblower']
+__all__ = ['Vigilante']
 
 
-class PoliceWhistleblower(PoliceNotifier, BaseAnalyzer):
+class Vigilante(BaseAnalyzer):
     def __init__(self, *args, **kwargs):
-        super(PoliceWhistleblower, self).__init__(*args, **kwargs)
+        super(Vigilante, self).__init__(*args, **kwargs)
 
     def _analyze(self, value, confidence, image, **kwargs):
         # check if already notified about value
