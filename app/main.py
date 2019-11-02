@@ -13,7 +13,7 @@ def run():
     #
     # stream.run()
 
-    agent = LicensePlateOpenCVPoliceWhistleblowerAgent(**dict(grace_period=5, precision=70,
+    agent = LicensePlateOpenCVPoliceWhistleblowerAgent(**dict(grace_period=5, precision=90, display_frame=True,
                                                               camera_metadata=dict(camera_url=camera_url,
                                                                                    general=dict(model='HP', id=17,
                                                                                                 location='Radom'))))
