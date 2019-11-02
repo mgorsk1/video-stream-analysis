@@ -48,7 +48,7 @@ def prepare(log_level, log_dir, app_name, **kwargs):
     try:
         if not path.exists(log_dir):
             makedirs(log_dir)
-    except:
+    except Exception:
         print(exc_info())
 
     # load json config and replace placeholders with actual values

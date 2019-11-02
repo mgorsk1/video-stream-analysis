@@ -31,7 +31,7 @@ class ResultDatabase(BaseDatabase):
             db_info = self.db.info()
 
             log.info("established #connection with #elasticsearch", extra=dict(elasticsearch=db_info))
-        except Exception as e:
+        except ElasticsearchException:
             log.error("error while establishing #connection with #elasticsearch", exc_info=True)
 
             exit(1)
@@ -89,14 +89,14 @@ class ResultDatabase(BaseDatabase):
     def del_val(self, key):
         try:
             self.db.delete(index=self.index, doc_type='default', id=key)
-        except ElasticsearchException as e:
+        except ElasticsearchException:
             log.error("#error while #delete document", exc_info=True, extra=dict(id=key))
 
     def _create_index(self):
         try:
             self.db.indices.create(self.index)
             log.info("#index successfully #created", extra=dict(index=self.index))
-        except ElasticsearchException as e:
+        except ElasticsearchException:
             log.error("#error #creating #index", exc_info=True, extra=dict(index=self.index))
 
     def _install_index_template(self, template_name):

@@ -97,17 +97,22 @@ class BaseExecutor:
         Send request to pushover_notify API with data:
 
         token (required) - your application"s API token
-        user (required) - the user/group key (not e-mail address) of your user (or you), viewable when logged into our dashboard (often referred to as USER_KEY in our documentation and code examples)
+        user (required) - the user/group key (not e-mail address) of your user (or you), viewable when logged into our
+        dashboard (often referred to as USER_KEY in our documentation and code examples)
         message (required) - your message
         Some optional parameters may be included:
-        attachment - an image attachment to send with the message; see attachments for more information on how to upload files
-        device - your user"s device name to send the message directly to that device, rather than all of the user"s devices (multiple devices may be separated by a comma)
+        attachment - an image attachment to send with the message; see attachments for more information on how to
+        upload files
+        device - your user"s device name to send the message directly to that device, rather than all of the user"s
+        devices (multiple devices may be separated by a comma)
         title - your message"s title, otherwise your app"s name is used
         url - a supplementary URL to show with your message
         url_title - a title for your supplementary URL, otherwise just the URL is shown
-        priority - send as -2 to generate no notification/alert, -1 to always send as a quiet notification, 1 to display as high-priority and bypass the user"s quiet hours, or 2 to also require confirmation from the user
+        priority - send as -2 to generate no notification/alert, -1 to always send as a quiet notification, 1 to
+        display as high-priority and bypass the user"s quiet hours, or 2 to also require confirmation from the user
         sound - the name of one of the sounds supported by device clients to override the user"s default sound choice
-        timestamp - a Unix timestamp of your message"s date and time to display to the user, rather than the time your message is received by our API
+        timestamp - a Unix timestamp of your message"s date and time to display to the user, rather than the time your
+        message is received by our API
 
         :param title: title for message
         :param message: message
@@ -158,7 +163,7 @@ class BaseExecutor:
 
         try:
             self.bucket.make_public(recursive=True, future=True)
-        except:
+        except Exception:
             pass
 
     def _setup_pushover(self):

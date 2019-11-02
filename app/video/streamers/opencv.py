@@ -24,7 +24,7 @@ class OpenCVCameraStreamer(BaseStreamer):
                 val = self.camera.get(v)
                 if val > -1:
                     camera_metadata[k] = val
-            except:
+            except Exception:
                 pass
 
         self.metadata.update(dict(camera=camera_metadata))

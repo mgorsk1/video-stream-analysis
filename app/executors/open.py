@@ -12,7 +12,7 @@ class GateOpener(BaseExecutor):
         self.open_time = 120
 
     def _action(self, value, confidence, image, uuid, **kwargs):
-        file = super(GateOpener, self)._action(value, confidence, image, uuid)
+        super(GateOpener, self)._action(value, confidence, image, uuid)
 
         self._open_gate(value)
 
