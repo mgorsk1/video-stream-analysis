@@ -30,7 +30,7 @@ class BaseStreamer(ABC):
         self.run()
 
     def search(self, frame, **kwargs):
-        return frame, None
+        return None, frame
 
     def run(self):
         i = 0
