@@ -11,6 +11,7 @@ from requests import post, HTTPError
 from app.config import log, BASE_PATH, config
 from app.dbs.result import ResultDatabase
 from app.dbs.temporary import TemporaryDatabase
+from app.tools import format_key_active
 
 
 class BaseExecutor:
@@ -43,12 +44,9 @@ class BaseExecutor:
 
         attributes = dumps(dict(time_added=time(), confidence=confidence)).encode('utf-8')
 
-        if self.reset_after <= 0:
-            self.tdb.set_val(value + ':Y', attributes)
-        else:
-            self.tdb.set_val(value + ':Y', attributes, ex=self.reset_after)
-
         self.action(value, confidence, image, run_uuid, **dict(kwargs))
+
+        self.tdb.set_val(format_key_active(value), attributes, ex=max(self.reset_after, 1))
 
     def action(self, value, confidence, image, uuid, **kwargs):
         exact_match = self.rdb.get_val(value, field='value', ago=self.reset_after, fuzzy=False)
@@ -133,6 +131,11 @@ class BaseExecutor:
                             url=url)
 
         try:
+            log.info("#sending #pushover #notification", extra=dict(pushover=dict(message=message,
+                                                                                  title=title,
+                                                                                  url=url,
+                                                                                  device=device)))
+
             result = post("https://api.pushover.net/1/messages.json", data=request_data)
 
             log.info("#delivered #pushover #notification", extra=dict(pushover=dict(message=message,
@@ -180,6 +183,10 @@ class BaseExecutor:
         log.info("#saved #image", extra=dict(filePath=full_path, folder=folder, ext=ext))
 
         return full_path
+
+    @staticmethod
+    def skip(*args, **kwargs):
+        pass
 
     @staticmethod
     def _get_storage_client():

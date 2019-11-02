@@ -38,9 +38,10 @@ class BaseAnalyzer(ABC):
             value = result.get('value')
             confidence = result.get('confidence')
             image = result.get('image')
-            metadata = result.get('metadata')
+            metadata = result.get('metadata', dict())
 
-            self.analyze(value, confidence, image, **metadata)
+            if value:
+                self.analyze(value, confidence, image, **metadata)
 
         return results, frame
 

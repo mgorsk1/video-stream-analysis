@@ -1,9 +1,9 @@
 from json import loads
 from time import time
+from math import ceil
 
 from app.analyzers.base import BaseAnalyzer
 from app.config import log
-from app.executors.notify import PoliceNotifier
 from app.tools import format_key_active, format_key_inactive
 
 __all__ = ['Vigilante']
@@ -42,6 +42,6 @@ class Vigilante(BaseAnalyzer):
                 self.tdb.set_val(format_key_inactive(value),
                                  dict(confidence=confidence, value=value,
                                       time_added=time()),
-                                 ex=self.grace_period + 5)
+                                 ex=ceil(self.grace_period * 1.25))
         else:
             log.info("detection already filed", extra=dict(value=value))
