@@ -184,3 +184,18 @@ class BaseExecutor:
     @staticmethod
     def _get_storage_client():
         return storage.Client(project=getenv('GCP_PROJECT_ID'))
+
+
+class FastTrackBaseExecutor(BaseExecutor):
+    """
+
+    FastTrackBaseExecutor class should be used when we want to skip checks in Result Database.
+
+    """
+
+    def action(self, value, confidence, image, uuid, **kwargs):
+        log.info("fast tracking processing", extra=dict(value=value))
+
+        self._action(value, confidence, image, uuid, **dict(kwargs))
+
+        log.info("#notification send about value", extra=dict(value=value, confidence=confidence))
