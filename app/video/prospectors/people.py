@@ -44,17 +44,17 @@ class PeopleProspector(BaseProspector):
         for (x, y, w, h) in matches:
             roi_gray = clean_frame[y:y + h, x:x + w]
 
-            value, conf = self.recognizer.predict(roi_gray)
+            value, confidence = self.recognizer.predict(roi_gray)
 
             value = self.labels[value]
 
-            conf_level = self.find_level(conf)
+            conf_level = self.find_level(confidence)
 
-            if conf >= self.precision:
+            if confidence >= self.precision:
                 frame = self.format_result(frame, value, conf_level, (x, y + h), (x + w, y))
 
-                result_set.append(dict(value=value, confidence=conf))
+                result_set.append(dict(value=value, confidence=confidence))
 
-                self.pass_to_analyze(value, conf, frame)
+                self.pass_to_analyze(value, confidence, frame)
 
         return result_set, frame

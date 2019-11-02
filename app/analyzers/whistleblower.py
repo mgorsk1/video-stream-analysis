@@ -13,7 +13,7 @@ class PoliceWhistleblower(PoliceNotifier, BaseAnalyzer):
     def __init__(self, *args, **kwargs):
         super(PoliceWhistleblower, self).__init__(*args, **kwargs)
 
-    def analyze(self, value, confidence, image, **kwargs):
+    def _analyze(self, value, confidence, image, **kwargs):
         # check if already notified about value
         #   if not - check if already detected value
         #       if yes - check value whether it's within its grace_period
@@ -29,7 +29,6 @@ class PoliceWhistleblower(PoliceNotifier, BaseAnalyzer):
             already_detected = self.tdb.get_val(format_key_inactive(value))
 
             if already_detected:
-
                 data = loads(already_detected.decode('utf-8'))
 
                 time_added = data.get('time_added', time())
@@ -43,6 +42,6 @@ class PoliceWhistleblower(PoliceNotifier, BaseAnalyzer):
                 self.tdb.set_val(format_key_inactive(value),
                                  dict(confidence=confidence, value=value,
                                       time_added=time()),
-                                 ex=self.grace_period + 60)
+                                 ex=self.grace_period + 5)
         else:
             log.info("detection already filed", extra=dict(value=value))

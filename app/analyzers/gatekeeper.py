@@ -18,7 +18,7 @@ class Gatekeeper(GateOpener, BaseAnalyzer):
             for value in whitelist:
                 self.tdb.set_val(format_whitelist_key(value), 'whitelisted')
 
-    def analyze(self, value, confidence, image, **kwargs):
+    def _analyze(self, value, confidence, image, **kwargs):
         # check if gate already opened
         #   if yes - do nothing
         #   if no - check if value in database

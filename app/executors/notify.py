@@ -20,8 +20,8 @@ class PoliceNotifier(BaseExecutor):
         additional_data = dict(kwargs)
         additional_data.update(dict(gcp_file_url=file))
 
-        camera_location = dict(kwargs).get('metadata', dict()).get('general', dict()).get('location', 'n/a')
-        camera_id = dict(kwargs).get('metadata', dict()).get('general', dict()).get('id', 'n/a')
+        camera_location = dict(kwargs).get('general', dict()).get('location', 'n/a')
+        camera_id = dict(kwargs).get('general', dict()).get('id', 'n/a')
 
         self.notify(title_temvalue.format(cl=camera_location, rn=value), message_temvalue.format(rn=value,
                                                                                                  cf=str(

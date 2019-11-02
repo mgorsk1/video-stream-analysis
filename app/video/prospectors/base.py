@@ -1,10 +1,7 @@
 from abc import ABC, abstractmethod
-from threading import Thread
 from time import strftime
 
 import cv2
-
-from app.config import log
 
 __all__ = ['BaseProspector']
 
@@ -37,7 +34,7 @@ class BaseProspector(ABC):
     def search(self, frame, **kwargs):
         pass
 
-    def analyze(self, value, conf, image, **kwargs):
+    def analyze(self, value, confidence, image, **kwargs):
         return None
 
     def find_level(self, value):
@@ -75,11 +72,3 @@ class BaseProspector(ABC):
                         (0, 0, 0), self.lineType)
 
         return frame
-
-    def pass_to_analyze(self, value, conf, image, **kwargs):
-        log.info("starting thread for #analysis of #image",
-                 extra=dict(target=self.analyze, args=(value, conf, image)))
-
-        t = Thread(target=self.analyze, args=(value, conf, image,), kwargs=dict(kwargs))
-
-        t.start()
