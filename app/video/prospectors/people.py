@@ -55,6 +55,4 @@ class PeopleProspector(BaseProspector):
 
                 result_set.append(dict(value=value, confidence=confidence))
 
-                self.pass_to_analyze(value, confidence, frame)
-
         return result_set, frame
