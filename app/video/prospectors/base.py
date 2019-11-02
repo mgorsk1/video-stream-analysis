@@ -11,7 +11,6 @@ class BaseProspector(ABC):
     BaseProspector class is responsible for analyzing stream of images and search for particular objects within them.
 
     Once found - it's passed to analysis.
-
     """
 
     def __init__(self, *args, **kwargs):

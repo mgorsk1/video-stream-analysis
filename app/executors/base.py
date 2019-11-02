@@ -195,9 +195,7 @@ class BaseExecutor:
 
 class FastTrackBaseExecutor(BaseExecutor):
     """
-
     FastTrackBaseExecutor class should be used when we want to skip checks in Result Database.
-
     """
 
     def action(self, value, confidence, image, uuid, **kwargs):

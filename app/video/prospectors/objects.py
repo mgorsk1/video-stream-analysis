@@ -13,8 +13,6 @@ from app.config import BASE_PATH
 class ObjectGCPProspector(BaseProspector):
     """
     ObjectGCPProspector class is responsible for recognizing objects in stream using ML models from Google Cloud.
-
-
     """
 
     def __init__(self, *args, **kwargs):

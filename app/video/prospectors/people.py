@@ -11,8 +11,6 @@ __all__ = ['PeopleProspector']
 class PeopleProspector(BaseProspector):
     """
     PeopleProspector class is responsible for finding peoples faces in given stream of images.
-
-
     """
 
     def __init__(self, *args, **kwargs):

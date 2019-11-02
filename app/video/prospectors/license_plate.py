@@ -11,7 +11,6 @@ __all__ = ['LicensePlateProspector']
 class LicensePlateProspector(BaseProspector):
     """
     LicensePlateProspector class is responsible for finding license plate objects in given stream of images.
-
     """
 
     def __init__(self, *args, **kwargs):
