@@ -13,18 +13,19 @@ services:
       - /dev/video0:/dev/video0
   redis:
     image: redis:5.0.3-alpine
+    hostname: redis
     privileged: true
     ports:
       - "6379:6379"
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
     privileged: true
     ports:
       - "9200:9200"
-#  kibana:
-#    image: docker.elastic.co/kibana/kibana:6.6.0
-#    privileged: true
-#    ports:
-#      - "5601:5601"
-#    volumes:
-#      - ./config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
