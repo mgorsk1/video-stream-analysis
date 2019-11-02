@@ -2,11 +2,12 @@ from json import dumps
 from time import time, sleep
 
 from app.config import log
-from . import Executor
+from app.executors.base import BaseExecutor
 
 
-class GateOpener(Executor):
+class GateOpener(BaseExecutor):
     def __init__(self, *args, **kwargs):
+        print("GATE OPENER INIT")
         super(GateOpener, self).__init__(*args, **kwargs)
 
         self.open_time = 120

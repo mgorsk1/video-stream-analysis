@@ -1,17 +1,18 @@
 from json import loads
 from time import time
 
+from app.analyzers.base import BaseAnalyzer
+from app.config import log
 from app.executors.notify import PoliceNotifier
 from app.tools import format_key_active, format_key_inactive
-from app.config import log
-from . import Analyzer
+
+__all__ = ['PoliceWhistleblower']
 
 
-class Whistleblower(PoliceNotifier, Analyzer):
+class PoliceWhistleblower(PoliceNotifier, BaseAnalyzer):
     def __init__(self, *args, **kwargs):
-        super(Whistleblower, self).__init__(*args, **kwargs)
-
-        Analyzer.__init__(self, dict(kwargs).get('grace_period'), 8 * 60 * 60)
+        print("WHISTLEBLOWER INIT")
+        super(PoliceWhistleblower, self).__init__(*args, **kwargs)
 
     def analyze(self, value, confidence, image, **kwargs):
         # check if already notified about value
@@ -43,6 +44,6 @@ class Whistleblower(PoliceNotifier, Analyzer):
                 self.tdb.set_val(format_key_inactive(value),
                                  dict(confidence=confidence, value=value,
                                       time_added=time()),
-                                 ex=self.grace_period+60)
+                                 ex=self.grace_period + 60)
         else:
             log.info("detection already filed", extra=dict(value=value))

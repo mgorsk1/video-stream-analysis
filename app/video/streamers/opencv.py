@@ -1,58 +1,18 @@
-from abc import abstractmethod
 from math import ceil
+
 import cv2
 
+from app.video.streamers.base import BaseStreamer
 
-class Stream:
-    def __init__(self, desired_fps, prospector, display_frame=True, **kwargs):
-        self.camera = None
-        self.fps = None
-
-        self.prospector = prospector
-        self.desired_fps = desired_fps
-
-        self.display_frame = display_frame
-
-        self.metadata = dict(kwargs)
-
-    @abstractmethod
-    def get_raw_frame(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def __exit__(self, exc_type, exc_value, traceback):
-        raise NotImplementedError
-
-    def __enter__(self):
-        self.run()
-
-    def run(self):
-        i = 0
-
-        while True:
-            i += 1
-
-            results, frame = self.get_raw_frame()
-
-            if i % self.fps == 0:
-                if self.prospector:
-                    results, frame = self.prospector.search(frame, **self.metadata)
-
-                if self.display_frame:
-                    self.display(frame)
-
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-    def display(self, frame):
-        cv2.imshow(self.window_name, frame)
+__all__ = ['OpenCVCameraStreamer']
 
 
-class CameraStreamOpenCV(Stream):
+class OpenCVCameraStreamer(BaseStreamer):
     camera_properties = {k: v for k, v in globals().get("cv2", dict()).__dict__.items() if k.startswith('CAP_PROP_')}
 
     def __init__(self, *args, **kwargs):
-        super(CameraStreamOpenCV, self).__init__(*args, **kwargs)
+        print("OPEN CV STREAMER INIT")
+        super(OpenCVCameraStreamer, self).__init__(*args, **kwargs)
 
         camera_url = dict(kwargs).get('camera_url', -1)
 
@@ -75,7 +35,7 @@ class CameraStreamOpenCV(Stream):
         if self.desired_fps >= camera_fps:
             self.desired_fps = camera_fps
 
-        self.fps = ceil(camera_fps/self.desired_fps)
+        self.fps = ceil(camera_fps / self.desired_fps)
 
         self.window_name = 'video-analysis'
 

@@ -1,16 +1,17 @@
 from json import loads
 
+from app.analyzers.base import BaseAnalyzer
+from app.config import log
 from app.executors.open import GateOpener
 from app.tools import format_whitelist_key
-from app.config import log
-from . import Analyzer
+
+__all__ = ['Gatekeeper']
 
 
-class Gatekeeper(GateOpener, Analyzer):
+class Gatekeeper(GateOpener, BaseAnalyzer):
     def __init__(self, *args, **kwargs):
+        print("GATEKEEPER INIT")
         super(Gatekeeper, self).__init__(*args, **kwargs)
-
-        Analyzer.__init__(dict(kwargs).get('grace_period'), 8 * 60 * 60)
 
         whitelist = dict(kwargs).get('whitelist')
 

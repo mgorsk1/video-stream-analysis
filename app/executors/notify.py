@@ -1,8 +1,12 @@
 from app.config import log
-from . import Executor
+from app.executors.base import BaseExecutor
 
 
-class PoliceNotifier(Executor):
+class PoliceNotifier(BaseExecutor):
+    def __init__(self, *args, **kwargs):
+        print("POLICE NOTIFIER INIT")
+        super(PoliceNotifier, self).__init__(*args, **kwargs)
+
     def _action(self, value, confidence, image, uuid, **kwargs):
         file = super(PoliceNotifier, self)._action(value, confidence, image, uuid)
 
@@ -21,8 +25,11 @@ class PoliceNotifier(Executor):
         camera_id = dict(kwargs).get('metadata', dict()).get('general', dict()).get('id', 'n/a')
 
         self.notify(title_temvalue.format(cl=camera_location, rn=value), message_temvalue.format(rn=value,
-                                                     cf=str(round(confidence, 3))+'%',
-                                                     cid=camera_id,
-                                                     cl=camera_location), file)
+                                                                                                 cf=str(
+                                                                                                     round(confidence,
+                                                                                                           3)) + '%',
+                                                                                                 cid=camera_id,
+                                                                                                 cl=camera_location),
+                    file)
 
         log.info("#police notified about #rascal", extra=dict(value=value))

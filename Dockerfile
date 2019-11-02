@@ -30,7 +30,7 @@ WORKDIR /opt
 RUN git clone https://github.com/openalpr/openalpr.git
 
 # Setup the build directory
-RUN mkdir openalpr/src/build
+RUN mkdir -p openalpr/src/build
 RUN cd openalpr/src/build
 
 # setup the compile environment
