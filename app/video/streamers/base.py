@@ -7,7 +7,6 @@ __all__ = ['BaseStreamer']
 
 class BaseStreamer(ABC):
     def __init__(self, *args, **kwargs):
-        print("BASE STREAMER INIT")
         super(BaseStreamer, self).__init__()
 
         self.camera = None

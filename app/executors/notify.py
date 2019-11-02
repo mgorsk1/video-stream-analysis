@@ -4,7 +4,6 @@ from app.executors.base import BaseExecutor
 
 class PoliceNotifier(BaseExecutor):
     def __init__(self, *args, **kwargs):
-        print("POLICE NOTIFIER INIT")
         super(PoliceNotifier, self).__init__(*args, **kwargs)
 
     def _action(self, value, confidence, image, uuid, **kwargs):

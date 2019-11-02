@@ -7,7 +7,6 @@ from app.executors.base import BaseExecutor
 
 class GateOpener(BaseExecutor):
     def __init__(self, *args, **kwargs):
-        print("GATE OPENER INIT")
         super(GateOpener, self).__init__(*args, **kwargs)
 
         self.open_time = 120

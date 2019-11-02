@@ -15,7 +15,6 @@ class LicensePlateProspector(BaseProspector):
     """
 
     def __init__(self, *args, **kwargs):
-        print("LICENSE PLATE PROSPECTOR INIT")
         super(LicensePlateProspector, self).__init__(*args, **kwargs)
 
         environ['TESSDATA_PREFIX'] = "{}/resources/runtime/ocr/".format(BASE_PATH)

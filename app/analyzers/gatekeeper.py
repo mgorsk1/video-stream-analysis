@@ -10,7 +10,6 @@ __all__ = ['Gatekeeper']
 
 class Gatekeeper(GateOpener, BaseAnalyzer):
     def __init__(self, *args, **kwargs):
-        print("GATEKEEPER INIT")
         super(Gatekeeper, self).__init__(*args, **kwargs)
 
         whitelist = dict(kwargs).get('whitelist')

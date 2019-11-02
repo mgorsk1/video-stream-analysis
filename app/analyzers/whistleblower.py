@@ -11,7 +11,6 @@ __all__ = ['PoliceWhistleblower']
 
 class PoliceWhistleblower(PoliceNotifier, BaseAnalyzer):
     def __init__(self, *args, **kwargs):
-        print("WHISTLEBLOWER INIT")
         super(PoliceWhistleblower, self).__init__(*args, **kwargs)
 
     def analyze(self, value, confidence, image, **kwargs):

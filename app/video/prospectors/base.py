@@ -18,7 +18,6 @@ class BaseProspector(ABC):
     """
 
     def __init__(self, *args, **kwargs):
-        print("BASE PROSPECTOR INIT")
         super(BaseProspector, self).__init__(*args, **kwargs)
 
         self.precision = kwargs.get('precision')

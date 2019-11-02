@@ -11,7 +11,6 @@ class OpenCVCameraStreamer(BaseStreamer):
     camera_properties = {k: v for k, v in globals().get("cv2", dict()).__dict__.items() if k.startswith('CAP_PROP_')}
 
     def __init__(self, *args, **kwargs):
-        print("OPEN CV STREAMER INIT")
         super(OpenCVCameraStreamer, self).__init__(*args, **kwargs)
 
         camera_url = dict(kwargs).get('camera_url', -1)

@@ -17,7 +17,6 @@ class BaseExecutor:
     save_file_function = 'save_image_to_gcp'
 
     def __init__(self, *args, **kwargs):
-        print("BASE EXECUTOR INIT")
         super(BaseExecutor, self).__init__(*args, **kwargs)
 
         self.reset_after = kwargs.get('reset_after', 60)

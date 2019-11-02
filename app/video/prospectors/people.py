@@ -16,7 +16,6 @@ class PeopleProspector(BaseProspector):
     """
 
     def __init__(self, *args, **kwargs):
-        print("PEOPLE PROSPECTOR INIT")
         super(PeopleProspector, self).__init__(*args, **kwargs)
 
         self.face_classifier = cv2.CascadeClassifier(
