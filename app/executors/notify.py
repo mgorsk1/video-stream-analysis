@@ -6,7 +6,14 @@ class PoliceNotifier(BaseExecutor):
     def __init__(self, *args, **kwargs):
         super(PoliceNotifier, self).__init__(*args, **kwargs)
 
+        self._setup_gcp()
+
     def _action(self, value, confidence, image, uuid, **kwargs):
+        extra = dict(value=value, confidence=confidence, uuid=uuid)
+        extra.update(kwargs)
+
+        log.info("#notyfing police about #rascal", extra=extra)
+
         file = super(PoliceNotifier, self)._action(value, confidence, image, uuid)
 
         title_temvalue = "{cl} Parking Violation! Registration number: {rn}"
@@ -31,4 +38,4 @@ class PoliceNotifier(BaseExecutor):
                                                                                                  cl=camera_location),
                     file)
 
-        log.info("#police notified about #rascal", extra=dict(value=value))
+        log.info("#police notified about #rascal", extra=dict(value=dict(value=value)))

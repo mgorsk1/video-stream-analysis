@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
+from json import dumps
 from ssl import create_default_context
 from sys import exit
+from uuid import uuid4
 
 from elasticsearch import Elasticsearch, ElasticsearchException, NotFoundError
 
@@ -13,6 +15,7 @@ class ResultDatabase(BaseDatabase):
         super(ResultDatabase, self).__init__(host, port, index, **kwargs)
 
         self.index = index
+        self.index_type = kwargs.get('elasticsearch_index_type', 'doc')
 
     def init(self, host, port, index, **kwargs):
         kwargs = dict(kwargs)
@@ -42,8 +45,11 @@ class ResultDatabase(BaseDatabase):
 
         self._create_index()
 
-    def get_val(self, key, **kwargs):
+    def _get_val(self, key, **kwargs):
         field = dict(kwargs).get('field')
+
+        extra = dict(key=key)
+        extra.update(kwargs)
 
         time_ago = datetime.utcnow() - timedelta(seconds=dict(kwargs).get('ago'))
         time_ago = time_ago.strftime('%Y-%m-%dT%H:%M:%S.%f')
@@ -59,38 +65,39 @@ class ResultDatabase(BaseDatabase):
         else:
             query = {"query": {
                 "bool": {"must": {"match": {field: key}}, "filter": {"range": {"@timestamp": {"gte": time_ago}}}}}}
-        try:
-            search = self.db.search(self.index, 'default', query)
-        except ElasticsearchException:
-            log.error("#error querying #elasticsearch", exc_info=True)
-            return None
+
+        search = self.db.search(self.index, self.index_type, query)
 
         results = search.get('hits').get('hits')
 
-        log.debug("#results for field #received", extra=dict(field=field, value=key, results=results))
-
         if len(results) > 0:
-            return results
+            return results, extra
         else:
-            return None
+            return None, extra
 
-    def set_val(self, key, value, **kwargs):
+    def _set_val(self, key, value, **kwargs):
+        extra = dict(index=self.index, doc_type=self.index_type)
+        extra.update(kwargs)
+
         body = value
         body['@timestamp'] = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')
 
+        _id = uuid4()
+
         body.update(dict(kwargs))
 
-        self.db.index(self.index, 'default', body, id=id)
-
-        log.info('#indexed doc', extra=dict(value=value, id=id))
+        self.db.index(self.index, self.index_type, body, id=_id)
 
         self.db.indices.refresh(self.index)
 
-    def del_val(self, key):
-        try:
-            self.db.delete(index=self.index, doc_type='default', id=key)
-        except ElasticsearchException:
-            log.error("#error while #delete document", exc_info=True, extra=dict(id=key))
+        return extra
+
+    def _del_val(self, key):
+        extra = dict(index=self.index, doc_type=self.index_type, key=key)
+
+        self.db.delete(index=self.index, doc_type=self.index_type, id=key)
+
+        return extra
 
     def _create_index(self):
         try:
@@ -110,12 +117,15 @@ class ResultDatabase(BaseDatabase):
                 if template_body is not None:
                     self.db.indices.put_template(name=template_name, body=template_body, master_timeout="60s")
 
-                    log.info("Template {0} successfully registered".format(template_name))
+                    log.info("#template successfully #registered", extra=dict(template_name=template_name,
+                                                                              template_body=template_body))
                 else:
-                    log.warning('Template body {0} does not exist - index template has not been registered'.format(
-                        template_name))
+                    log.warning('#template body does #not #exist - index template has not been registered',
+                                extra=dict(template_name=template_name))
             except ElasticsearchException as e:
-                log.error('Error registering index template: {e}'.format(e=e.args))
+                log.error('#error #registering index #template', extra=dict(template_name=template_name),
+                          exc_info=True)
+
                 raise e
 
     def _check_if_template_exists(self, template_name):

@@ -1,4 +1,4 @@
-from json import dumps
+from json import dumps, loads
 from sys import exit
 
 from redis import Redis
@@ -32,14 +32,17 @@ class TemporaryDatabase(BaseDatabase):
 
             exit(1)
 
-    def get_val(self, key, **kwargs):
+    def _get_val(self, key, **kwargs):
         result = self.db.get(key)
 
-        log.debug('#received result for #redis #key', extra=dict(key=key, result=result))
+        try:
+            result = loads(result)
+        except TypeError:
+            result = None
 
-        return result
+        return result, kwargs
 
-    def set_val(self, key, val, **kwargs):
+    def _set_val(self, key, val, **kwargs):
         ex = dict(**kwargs).get('ex', False)
 
         if not isinstance(val, bytes):
@@ -52,9 +55,7 @@ class TemporaryDatabase(BaseDatabase):
         else:
             self.db.set(key, value_dumped, nx=True)
 
-        log.debug('#set value for #redis #key', extra=dict(key=key, value=value_dumped))
+        return kwargs
 
-    def del_val(self, key):
+    def _del_val(self, key):
         self.db.delete(key)
-
-        log.debug('#deleted #redis #key', extra=dict(key=key))

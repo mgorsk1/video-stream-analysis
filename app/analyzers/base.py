@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from os import getenv
-from threading import Thread
+from threading import Thread, Lock
 
 from app.config import config, log
 from app.dbs.temporary import TemporaryDatabase
@@ -16,12 +16,15 @@ class BaseAnalyzer(ABC):
 
 
     """
+
     def __init__(self, *args, **kwargs):
         super(BaseAnalyzer, self).__init__(*args, **kwargs)
         # in seconds
         self.grace_period = kwargs.get('grace_period', 60)
 
         self.tdb = TemporaryDatabase(config.get('TDB_HOST'), config.get('TDB_PORT'), **dict(db_pass=getenv('TDB_PASS')))
+
+        self.lock = Lock()
 
     def analyze(self, value, confidence, image, **kwargs):
         log.info("starting thread for #analysis of #image",
@@ -45,8 +48,16 @@ class BaseAnalyzer(ABC):
 
         return results, frame
 
-    def take_action(*args, **kwargs):
-        log.info("Take action called. Received data:", extras=dict(args=args, kwargs=kwargs))
+    def take_action(self, value, confidence, image, **kwargs):
+        log.info("take #action #called", extra=dict(value=value, confidence=confidence, image=image, kwargs=kwargs))
+
+    def acquire_lock(self):
+        log.info("#acquiring #lock")
+        self.lock.acquire()
+
+    def release_lock(self):
+        log.info("#releasing #lock")
+        self.lock.release()
 
     @abstractmethod
     def _analyze(self, value: str, confidence: float, image, **kwargs) -> None:

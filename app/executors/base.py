@@ -52,7 +52,7 @@ class BaseExecutor:
         exact_match = self.rdb.get_val(value, field='value', ago=self.reset_after, fuzzy=False)
         if exact_match is None:
             log.info("#value does not exist in result #database", extra=dict(value=value))
-            fuzzy_match = self.rdb.get_val(value, field='value', ago=self.reset_after, fuzzy=False)
+            fuzzy_match = self.rdb.get_val(value, field='value', ago=self.reset_after, fuzzy=True)
             if fuzzy_match is None:
                 log.info("#similar #value does not exist in result #database", extra=dict(value=value))
                 candidates_match = self.rdb.get_val(value, field='candidates', ago=self.reset_after, fuzzy=False)
@@ -72,9 +72,6 @@ class BaseExecutor:
         pass
 
     def save_image_to_gcp(self, value, image, uuid):
-        if self.bucket is None:
-            self._setup_gcp()
-
         tmp_file = BaseExecutor.save_image_locally(value, image, uuid, 'tmp', 'png')
 
         filename = "{}_{}.png".format(value, uuid)

@@ -19,7 +19,7 @@ class TrashCanSuggester(FastTrackBaseExecutor):
 
         self.turn_led_on(value)
 
-        log.info("#trash fraction suggested", extra=dict(value=value))
+        log.info("#trash fraction #suggested", extra=dict(value=value))
 
     def turn_led_on(self, category):
         led = self.category_to_pin.get(category)

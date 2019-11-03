@@ -1,13 +1,12 @@
-import cv2
-
 from json import loads
-from google.cloud import vision
-from google.cloud.vision import types
 from typing import Dict, Tuple, Optional
 
-from app.video.prospectors.base import BaseProspector
+import cv2
+from google.cloud import vision
+from google.cloud.vision import types
 
 from app.config import BASE_PATH
+from app.video.prospectors.base import BaseProspector
 
 
 class ObjectGCPProspector(BaseProspector):

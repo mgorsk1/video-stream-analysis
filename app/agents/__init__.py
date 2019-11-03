@@ -1,6 +1,6 @@
+from app.analyzers.brainless import Brainless
 from app.analyzers.gatekeeper import Gatekeeper
 from app.analyzers.vigilante import Vigilante
-from app.analyzers.brainless import Brainless
 from app.executors.notify import PoliceNotifier
 from app.executors.open import GateOpener
 from app.executors.suggest import TrashCanSuggester

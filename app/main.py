@@ -1,4 +1,4 @@
-from app.agents import LicensePlateOpenCVPoliceWhistleblowerAgent
+from app.agents import LicensePlateOpenCVVigilanteAgent
 
 
 def run():
@@ -13,10 +13,15 @@ def run():
     #
     # stream.run()
 
-    agent = LicensePlateOpenCVPoliceWhistleblowerAgent(**dict(grace_period=5, precision=90, display_frame=True,
-                                                              camera_metadata=dict(camera_url=camera_url,
-                                                                                   general=dict(model='HP', id=17,
-                                                                                                location='Radom'))))
+    agent = LicensePlateOpenCVVigilanteAgent(
+        **dict(grace_period=5,
+               desired_fps=5,
+               precision=92,
+               display_frame=False,
+               reset_after=30,
+               camera_metadata=dict(camera_url=camera_url,
+                                    general=dict(model='HP', id=17,
+                                                 location='Radom'))))
 
     agent.run()
 

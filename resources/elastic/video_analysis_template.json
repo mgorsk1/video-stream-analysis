@@ -9,7 +9,7 @@
     }
   },
   "mappings": {
-    "default": {
+    "doc": {
       "_meta": {
         "version": "1.0.0"
       },
@@ -24,6 +24,16 @@
             "match_mapping_type": "string",
             "mapping": {
               "type": "keyword"
+            }
+          }
+        },
+        {
+          "time_added": {
+            "match_mapping_type": "double",
+            "match": "time_added",
+            "mapping": {
+              "type": "date",
+              "format": "epoch_second"
             }
           }
         }

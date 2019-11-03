@@ -17,7 +17,7 @@ class LicensePlateProspector(BaseProspector):
         super(LicensePlateProspector, self).__init__(*args, **kwargs)
 
         environ['TESSDATA_PREFIX'] = "{}/resources/runtime/ocr/".format(BASE_PATH)
-        environ['LD_LIBRARY_PATH'] = "/usr/include/"
+        environ['LD_LIBRARY_PATH'] = "/usr/lib/"
 
         self.alpr = Alpr("eu", "{}/config/openalpr.confidence".format(BASE_PATH),
                          "{}/resources/runtime/".format(BASE_PATH))
