@@ -1,0 +1,4 @@
+Camera location: {camera_location}
+Camera ID: {camera_id}
+Registration number: {value}
+Confidence: {confidence}

@@ -1,7 +1,7 @@
 from app.analyzers.brainless import Brainless
 from app.analyzers.gatekeeper import Gatekeeper
 from app.analyzers.vigilante import Vigilante
-from app.executors.notify import PoliceNotifier
+from app.executors.notify import PushoverNotifier
 from app.executors.open import GateOpener
 from app.executors.suggest import TrashCanSuggester
 from app.video.prospectors.license_plate import LicensePlateProspector
@@ -13,7 +13,7 @@ class LicensePlateOpenCVGatekeeperAgent(GateOpener, Gatekeeper, LicensePlatePros
     pass
 
 
-class LicensePlateOpenCVVigilanteAgent(PoliceNotifier, Vigilante, LicensePlateProspector, OpenCVCameraStreamer):
+class LicensePlateOpenCVVigilanteAgent(PushoverNotifier, Vigilante, LicensePlateProspector, OpenCVCameraStreamer):
     pass
 
 

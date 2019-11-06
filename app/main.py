@@ -19,6 +19,7 @@ def run():
                precision=92,
                display_frame=False,
                reset_after=30,
+               notification_type='parking_violation',
                camera_metadata=dict(camera_url=camera_url,
                                     general=dict(model='HP', id=17,
                                                  location='Radom'))))
