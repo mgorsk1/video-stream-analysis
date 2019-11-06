@@ -10,11 +10,11 @@ class PoliceNotifier(BaseExecutor):
 
     def _action(self, value, confidence, image, uuid, **kwargs):
         extra = dict(value=value, confidence=confidence, uuid=uuid)
-        extra.update(kwargs)
+        extra['kwargs'] = kwargs
 
         log.info("#notyfing police about #rascal", extra=extra)
 
-        file = super(PoliceNotifier, self)._action(value, confidence, image, uuid)
+        file = super(PoliceNotifier, self)._action(value, confidence, image, uuid, **kwargs)
 
         title_temvalue = "{cl} Parking Violation! Registration number: {rn}"
         message_temvalue = """

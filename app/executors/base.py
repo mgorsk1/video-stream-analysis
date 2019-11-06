@@ -23,6 +23,7 @@ class BaseExecutor:
         self.reset_after = kwargs.get('reset_after', 60)
 
         self.bucket_folder_name = underscore(self.__class__.__name__)
+
         self.index = 'video-analysis-{}'.format(self.bucket_folder_name)
 
         self.rdb = ResultDatabase(config.get('RDB_HOST'),
@@ -57,17 +58,17 @@ class BaseExecutor:
                 log.info("#similar #value does not exist in result #database", extra=dict(value=value))
                 candidates_match = self.rdb.get_val(value, field='candidates', ago=self.reset_after, fuzzy=False)
                 if candidates_match is None:
-                    log.info("#value does not exist amongst candidates in #database", extra=dict(value=value))
+                    log.info("#value does #not #exist amongst candidates in #database", extra=dict(value=value))
 
                     self._action(value, confidence, image, uuid, **dict(kwargs))
 
-                    log.info("#notification send about value", extra=dict(value=value, confidence=confidence))
+                    log.info("#notification #sent about value", extra=dict(value=value, confidence=confidence))
                 else:
-                    log.info("#value existed amongst candidates in #database", extra=dict(value=value))
+                    log.info("#value #existed amongst #candidates in #database", extra=dict(value=value))
             else:
-                log.info("#value matched another #similar value in #database", extra=dict(value=value))
+                log.info("#value #matched another #similar value in #database", extra=dict(value=value))
         else:
-            log.info("#value existed in #database", extra=dict(value=value))
+            log.info("#value #existed in #database", extra=dict(value=value))
 
         pass
 
@@ -78,12 +79,15 @@ class BaseExecutor:
 
         blob = self.bucket.blob('{}/{}'.format(self.bucket_folder_name, filename))
 
+        log.info("#saving #image to #gcp",
+                 extra=dict(gcp=dict(bucket=self.index, file_name=filename, public_url=blob.public_url)))
+
         blob.upload_from_filename(tmp_file, content_type="image/png")
 
         remove(tmp_file)
 
-        log.info("#image sent to #gcp #bucket",
-                 extra=dict(gcp=dict(bucket=self.index, fileName=filename, publicUrl=blob.public_url)))
+        log.info("#saved #image to #gcp",
+                 extra=dict(gcp=dict(bucket=self.index, file_name=filename, public_url=blob.public_url)))
 
         return blob.public_url
 
@@ -155,6 +159,8 @@ class BaseExecutor:
         self.rdb.init()
 
     def _setup_gcp(self):
+        log.info("#starting #gcp #setup")
+
         environ['GOOGLE_APPLICATION_CREDENTIALS'] = "{}/config/gcp/key.json".format(BASE_PATH)
 
         client = BaseExecutor._get_storage_client()
@@ -162,12 +168,18 @@ class BaseExecutor:
         self.bucket = client.bucket('video-analysis-file')
 
         try:
-            self.bucket.make_public(recursive=True, future=True)
+            self.bucket.make_public(future=True)
         except Exception:
             pass
 
+        log.info("#finished #gcp setup")
+
     def _setup_pushover(self):
+        log.info("#starting #pushover #setup")
+
         self.pushover_config = dict(APP_TOKEN=getenv("PUSHOVER_APP_TOKEN"), USER_KEY=getenv("PUSHOVER_USER_KEY"))
+
+        log.info("#finished #pushover #setup")
 
     @staticmethod
     def save_image_locally(value, image, uuid, folder, ext):
@@ -175,9 +187,11 @@ class BaseExecutor:
 
         full_path = "{}/{}/{}".format(BASE_PATH, folder, filename)
 
+        log.info("#saving #image #locally", extra=dict(file_name=filename, folder=folder, full_path=full_path, ext=ext))
+
         cv2.imwrite(full_path, image)
 
-        log.info("#saved #image", extra=dict(filePath=full_path, folder=folder, ext=ext))
+        log.info("#saved #image #locally", extra=dict(filePath=full_path, folder=folder, full_path=full_path, ext=ext))
 
         return full_path
 
@@ -196,7 +210,7 @@ class FastTrackBaseExecutor(BaseExecutor):
     """
 
     def action(self, value, confidence, image, uuid, **kwargs):
-        log.info("fast tracking processing", extra=dict(value=value))
+        log.info("#fast tracking #processing", extra=dict(value=value))
 
         self._action(value, confidence, image, uuid, **dict(kwargs))
 

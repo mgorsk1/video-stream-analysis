@@ -49,7 +49,7 @@ class ResultDatabase(BaseDatabase):
         field = dict(kwargs).get('field')
 
         extra = dict(key=key)
-        extra.update(kwargs)
+        extra['kwargs'] = kwargs
 
         time_ago = datetime.utcnow() - timedelta(seconds=dict(kwargs).get('ago'))
         time_ago = time_ago.strftime('%Y-%m-%dT%H:%M:%S.%f')
@@ -77,7 +77,7 @@ class ResultDatabase(BaseDatabase):
 
     def _set_val(self, key, value, **kwargs):
         extra = dict(index=self.index, doc_type=self.index_type)
-        extra.update(kwargs)
+        extra['kwargs'] = kwargs
 
         body = value
         body['@timestamp'] = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')

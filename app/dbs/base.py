@@ -29,7 +29,7 @@ class BaseDatabase(ABC):
 
     def get_val(self, key, **kwargs):
         extra = dict(key=key)
-        extra.update(kwargs)
+        extra['kwargs'] = kwargs
 
         try:
             result, metadata = self._get_val(key, **kwargs)
@@ -45,11 +45,9 @@ class BaseDatabase(ABC):
 
     def set_val(self, key, value, **kwargs):
         try:
-            extra = dict(key=key, payload=loads(value))
+            extra = dict(key=key, payload=loads(value), kwargs=kwargs)
         except TypeError:
-            extra = dict(key=key, payload=value)
-
-        extra.update(kwargs)
+            extra = dict(key=key, payload=value, kwargs=kwargs)
 
         try:
             result = self._set_val(key, value, **kwargs)
@@ -63,7 +61,7 @@ class BaseDatabase(ABC):
 
     def del_val(self, key, **kwargs):
         extra = dict(key=key)
-        extra.update(kwargs)
+        extra['kwargs'] = kwargs
 
         try:
             result = self._del_val(key, **kwargs)
