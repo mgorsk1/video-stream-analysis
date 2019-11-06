@@ -4,6 +4,7 @@ from abc import abstractmethod, ABC
 
 from app.config import log
 from app.executors.base import BaseExecutor
+from app.tools import format_key_open, format_key_close
 
 
 class BaseOpener(ABC, BaseExecutor):
@@ -24,7 +25,7 @@ class BaseOpener(ABC, BaseExecutor):
     def open(self, value):
         data = dict(timestamp=time(), value=value)
 
-        self.tdb.set_val(f'#{self.o} open', dumps(data))
+        self.tdb.set_val(format_key_open(self.o), dumps(data))
 
         self._open(value)
 
@@ -33,11 +34,11 @@ class BaseOpener(ABC, BaseExecutor):
     def close(self, value):
         data = dict(timestamp=time(), value=value)
 
-        self.tdb.del_val(f'#{self}:open')
+        self.tdb.del_val(format_key_open(self.o))
 
         self._close(value)
 
-        self.tdb.set_val(f'#{self}:close', dumps(data))
+        self.tdb.set_val(format_key_close(self.o), dumps(data))
 
         log.info(f'#{self} closed', extra=dict(value=value))
 
