@@ -13,7 +13,7 @@ class BaseOpener(ABC, BaseExecutor):
         self.open_time = kwargs.get('open_time', 120)
 
     def _action(self, value, confidence, image, uuid, **kwargs):
-        super(BaseOpener, self)._action(value, confidence, image, uuid)
+        super(BaseOpener, self)._action(value, confidence, image, uuid, **kwargs)
 
         self._open_gate(value)
 
