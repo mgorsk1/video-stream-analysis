@@ -1,4 +1,5 @@
 from json import loads
+from time import sleep
 
 from app.analyzers.base import BaseAnalyzer
 from app.config import log
@@ -25,6 +26,10 @@ class Gatekeeper(BaseAnalyzer):
         #       if no - do nothing
         log.info("#starting #analysis", extra=dict(value=value))
 
+        while self.lock.locked():
+            log.info("#waiting for #lock to be released")
+            sleep(1)
+
         gate_open = self.tdb.get_val('gate:open')
 
         if not gate_open:
@@ -35,7 +40,13 @@ class Gatekeeper(BaseAnalyzer):
             if license_value_allowed:
                 log.info("license plate #allowed", extra=dict(value=value))
 
-                self.take_action(value, confidence, image, **dict(kwargs))
+                self.acquire_lock()
+                try:
+                    self.take_action(value, confidence, image, **dict(kwargs))
+                except Exception:
+                    pass
+                finally:
+                    self.release_lock()
             else:
                 log.warning('license plate #not #allowed', extra=dict(value=value))
         else:
