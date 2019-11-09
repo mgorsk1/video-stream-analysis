@@ -1,7 +1,0 @@
-{
-  "RDB_HOST": "localhost",
-  "RDB_PORT": "9200",
-  "TDB_HOST": "localhost",
-  "TDB_PORT": "6379",
-  "LOG_LEVEL": "INFO"
-}

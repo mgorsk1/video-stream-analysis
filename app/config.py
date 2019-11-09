@@ -1,13 +1,21 @@
-from json import loads
-from os import path, getenv
+from app.logger import prepare
+from os import path
+from piny import YamlLoader
+from types import SimpleNamespace
 
-from .logger import prepare
 
-env = getenv('ENV', 'local')
+class NestedNamespace(SimpleNamespace):
+    def __init__(self, dictionary, **kwargs):
+        super().__init__(**kwargs)
+        for key, value in dictionary.items():
+            if isinstance(value, dict):
+                self.__setattr__(key, NestedNamespace(value))
+            else:
+                self.__setattr__(key, value)
+
 
 BASE_PATH = path.dirname(__file__) + '/..'
 
-with open('{}/config/app/{}.json'.format(BASE_PATH, env), 'r') as f:
-    config = loads(f.read())
+config = NestedNamespace(YamlLoader(path='{}/config/application/application.yaml'.format(BASE_PATH)).load())
 
-log = prepare('DEBUG', '/tmp', 'VideoAnalysis')
+log = prepare(config.log.level.upper(), '/tmp', 'VideoAnalysis')

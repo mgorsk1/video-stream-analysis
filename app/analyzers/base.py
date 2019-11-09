@@ -22,7 +22,9 @@ class BaseAnalyzer(ABC):
         # in seconds
         self.grace_period = kwargs.get('grace_period', 60)
 
-        self.tdb = TemporaryDatabase(config.get('TDB_HOST'), config.get('TDB_PORT'), **dict(db_pass=getenv('TDB_PASS')))
+        self.tdb = TemporaryDatabase(config.temporaryDb.connection.host,
+                                     config.temporaryDb.connection.port,
+                                     **dict(db_pass=config.temporaryDb.connection.auth.password))
 
         self.lock = Lock()
 
