@@ -26,19 +26,19 @@ class BaseExecutor:
 
         self.index = 'video-analysis-{}'.format(self.bucket_folder_name)
 
-        self.rdb = ResultDatabase(config.get('RDB_HOST'),
-                                  config.get('RDB_PORT'), self.index,
-                                  **dict(db_user=config.get('RDB_USER'),
-                                         db_pass=getenv('RDB_PASS'),
-                                         db_scheme=config.get('RDB_SCHEME')))
+        self.rdb = ResultDatabase(config.resultDb.connection.host,
+                                  config.resultDb.connection.port, self.index,
+                                  **dict(db_user=config.resultDb.connection.auth.user,
+                                         db_pass=config.resultDb.connection.auth.password,
+                                         db_scheme=config.resultDb.connection.scheme))
 
-        self.tdb = TemporaryDatabase(config.get('TDB_HOST'), config.get('TDB_PORT'), **dict(db_pass=getenv('TDB_PASS')))
+        self.tdb = TemporaryDatabase(config.temporaryDb.connection.host,
+                                     config.temporaryDb.connection.port,
+                                     **dict(db_pass=config.temporaryDb.connection.auth.password))
 
         self.save_file = None
 
         self.bucket = None
-
-        self.pushover_config = None
 
     def take_action(self, value, confidence, image, **kwargs):
         run_uuid = uuid4()
@@ -118,14 +118,11 @@ class BaseExecutor:
         :param url: optional url to pass
         :return: -
         """
-        if self.pushover_config is None:
-            self._setup_pushover()
-
         result = None
         device = "video-analysis"
 
-        request_data = dict(token=self.pushover_config.get("APP_TOKEN", ""),
-                            user=self.pushover_config.get("USER_KEY", ""),
+        request_data = dict(token=config.pushover.appToken,
+                            user=config.pushover.userKey,
                             message=message,
                             device=device,
                             title=title,
@@ -173,13 +170,6 @@ class BaseExecutor:
             pass
 
         log.info("#finished #gcp setup")
-
-    def _setup_pushover(self):
-        log.info("#starting #pushover #setup")
-
-        self.pushover_config = dict(APP_TOKEN=getenv("PUSHOVER_APP_TOKEN"), USER_KEY=getenv("PUSHOVER_USER_KEY"))
-
-        log.info("#finished #pushover #setup")
 
     @staticmethod
     def save_image_locally(value, image, uuid, folder, ext):

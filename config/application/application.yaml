@@ -1,0 +1,24 @@
+resultDb:
+  connection:
+    scheme: ${RESULT_DB_CONN_SCHEME:-http}
+    host: ${RESULT_DB_CONN_HOST:-localhost}
+    port: ${RESULT_DB_CONN_PORT:-9200}
+    auth:
+      user: ${RESULT_DB_CONN_AUTH_USER}
+      password: ${RESULT_DB_CONN_AUTH_PASSWORD}
+
+temporaryDb:
+  connection:
+    scheme: ${RESULT_DB_CONN_SCHEME:-http}
+    host: ${TEMPORARY_DB_CONN_HOST:-localhost}
+    port: ${TEMPORARY_DB_CONN_PORT:-6379}
+    auth:
+      user: ${TEMPORARY_DB_CONN_AUTH_USER}
+      password: ${TEMPORARY_DB_CONN_AUTH_PASSWORD}
+
+pushover:
+  appToken: ${PUSHOVER_APP_TOKEN}
+  userKey: ${PUSHOVER_USER_KEY}
+
+log:
+  level: ${LOG_LEVEL:-info}

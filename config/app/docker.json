@@ -1,7 +1,0 @@
-{
-  "RDB_HOST": "elastic",
-  "RDB_PORT": "9200",
-  "TDB_HOST": "redis",
-  "TDB_PORT": "6379",
-  "LOG_LEVEL": "INFO"
-}
