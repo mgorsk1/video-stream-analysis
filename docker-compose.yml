@@ -25,18 +25,20 @@ services:
     ports:
       - "8081:8081"
   elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
     hostname: elastic
     privileged: true
     ports:
       - "9200:9200"
+    environment:
+      discovery.type: single-node
   logstash:
-    image: docker.elastic.co/logstash/logstash:6.6.0
+    image: docker.elastic.co/logstash/logstash:7.2.0
     volumes:
       - /tmp/log:/tmp/log/
       - ./resources/logstash:/usr/share/logstash/pipeline/
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.6.0
+    image: docker.elastic.co/kibana/kibana:7.2.0
     privileged: true
     ports:
       - "5601:5601"

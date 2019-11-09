@@ -3,45 +3,41 @@
     "video-analysis-*"
   ],
   "settings": {
-    "index": {
       "number_of_shards": 1,
       "number_of_replicas": 1
-    }
   },
   "mappings": {
-    "doc": {
-      "_meta": {
-        "version": "1.0.0"
+    "_meta": {
+      "version": "1.0.0"
+    },
+    "date_detection": true,
+    "dynamic_date_formats": [
+      "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+      "yyyy-MM-dd HH:mm:ss.SSSSSS"
+    ],
+    "dynamic_templates": [
+      {
+        "strings": {
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "keyword"
+          }
+        }
       },
-      "date_detection": true,
-      "dynamic_date_formats": [
-        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-        "yyyy-MM-dd HH:mm:ss.SSSSSS"
-      ],
-      "dynamic_templates": [
-        {
-          "strings": {
-            "match_mapping_type": "string",
-            "mapping": {
-              "type": "keyword"
-            }
-          }
-        },
-        {
-          "time_added": {
-            "match_mapping_type": "double",
-            "match": "time_added",
-            "mapping": {
-              "type": "date",
-              "format": "epoch_second"
-            }
+      {
+        "time_added": {
+          "match_mapping_type": "double",
+          "match": "time_added",
+          "mapping": {
+            "type": "date",
+            "format": "epoch_second"
           }
         }
-      ],
-      "properties": {
-        "@timestamp": {
-          "type": "date"
-        }
+      }
+    ],
+    "properties": {
+      "@timestamp": {
+        "type": "date"
       }
     }
   }
