@@ -10,7 +10,9 @@ class TrashCanSuggester(FastTrackBaseExecutor):
     def __init__(self, *args, **kwargs):
         super(TrashCanSuggester, self).__init__(*args, **kwargs)
 
-        self.category_to_pin = dict(plastiki=1, szklo=2)
+        self.category_to_pin = dict(paper=":blue_heart:",
+                                    artificial=":yellow_heart:💛",
+                                    glass="💚:green_heart:", bio="🧡:heart:", mixed=":black_heart:🖤")
 
     def _action(self, value, confidence, image, uuid, **kwargs):
         log.info("suggesting #trash fraction", extra=dict(value=value))
@@ -24,8 +26,8 @@ class TrashCanSuggester(FastTrackBaseExecutor):
     def turn_led_on(self, category):
         led = self.category_to_pin.get(category)
 
-        log.info("turning #led #on", extra=dict(category=category, led=led))
+        log.info("turning #led #on", extra=dict(value=category, led=led))
 
-        sleep(3)
+        sleep(2)
 
-        log.info("turning #led #off", extra=dict(category=category, led=led))
+        log.info("turning #led #off", extra=dict(value=category, led=led))

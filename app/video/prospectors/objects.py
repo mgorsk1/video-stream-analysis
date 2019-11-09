@@ -5,7 +5,7 @@ import cv2
 from google.cloud import vision
 from google.cloud.vision import types
 
-from app.config import BASE_PATH
+from app.config import BASE_PATH, log
 from app.video.prospectors.base import BaseProspector
 
 
@@ -36,17 +36,19 @@ class ObjectGCPProspector(BaseProspector):
 
         # Performs label detection on the image file
         response = self.client.label_detection(image=img)
-        annotations = {l.description: l.score * 100 for l in response.label_annotations}
+        annotations = {l.description: round(l.score * 100, 2) for l in response.label_annotations}
+
+        log.debug("#received #annotations", extra=dict(annotations=annotations))
 
         result = self._get_best_pick(annotations)
 
         if result is not None:
-            description, value, confidence = result
+            description, category, confidence = [result.get(x) for x in ['description', 'category', 'confidence']]
 
             if confidence >= self.precision:
-                frame = self.format_result(frame, f'{value} ({description})', confidence, (x, y + h), (x + w, y))
+                frame = self.format_result(frame, f'{category} ({description})', confidence, (x, y + h), (x + w, y))
 
-                result_set.append(dict(value=value,
+                result_set.append(dict(value=category,
                                        confidence=confidence,
                                        image=frame,
                                        metadata=dict(original_object=description)))
@@ -64,6 +66,10 @@ class ObjectGCPProspector(BaseProspector):
             category = self.labels.get(description)
 
             if category:
-                return description, category, score
+                result = dict(description=description, category=category, confidence=score)
+
+                log.info("#found #best #pick", extra=dict(result=result))
+
+                return result
 
         return None

@@ -213,5 +213,3 @@ class FastTrackBaseExecutor(BaseExecutor):
         log.info("#fast tracking #processing", extra=dict(value=value))
 
         self._action(value, confidence, image, uuid, **dict(kwargs))
-
-        log.info("#notification send about value", extra=dict(value=value, confidence=confidence))
