@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from json import dumps
 from ssl import create_default_context
 from sys import exit
 from uuid import uuid4
@@ -104,7 +103,7 @@ class ResultDatabase(BaseDatabase):
             self.db.indices.create(self.index)
             log.info("#index successfully #created", extra=dict(index=self.index))
         except ElasticsearchException:
-            log.error("#error #creating #index", exc_info=True, extra=dict(index=self.index))
+            log.warn("#index #exists", exc_info=True, extra=dict(index=self.index))
 
     def _install_index_template(self, template_name):
         template_name_file = template_name.replace('-', '_') + '_template.json'
@@ -123,8 +122,8 @@ class ResultDatabase(BaseDatabase):
                     log.warning('#template body does #not #exist - index template has not been registered',
                                 extra=dict(template_name=template_name))
             except ElasticsearchException as e:
-                log.error('#error #registering index #template', extra=dict(template_name=template_name),
-                          exc_info=True)
+                log.warn('#template #exists', extra=dict(template_name=template_name),
+                         exc_info=True)
 
                 raise e
 

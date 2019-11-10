@@ -54,7 +54,7 @@ class Vigilante(BaseAnalyzer):
                     try:
                         self.take_action(value, confidence, image, **dict(kwargs))
                     except Exception:
-                        pass
+                        log.warning("#error taking #action", exc_info=True)
                     finally:
                         self.release_lock()
                 else:

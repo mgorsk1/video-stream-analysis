@@ -1,5 +1,5 @@
 from json import dumps
-from os import getenv, environ, remove
+from os import getenv, environ, remove, mkdir
 from time import time
 from uuid import uuid4
 
@@ -79,15 +79,22 @@ class BaseExecutor:
 
         blob = self.bucket.blob('{}/{}'.format(self.bucket_folder_name, filename))
 
-        log.info("#saving #image to #gcp",
-                 extra=dict(gcp=dict(bucket=self.index, file_name=filename, public_url=blob.public_url)))
+        extra = dict(gcp=dict(bucket=self.index, file_name=filename, public_url=blob.public_url))
 
-        blob.upload_from_filename(tmp_file, content_type="image/png")
+        log.info("#saving #image to #gcp",
+                 extra=extra)
+
+        try:
+            blob.upload_from_filename(tmp_file, content_type="image/png")
+        except Exception:
+            log.error("#error #uploading #image to #gcp",
+                      extra=extra,
+                      exc_info=True)
 
         remove(tmp_file)
 
         log.info("#saved #image to #gcp",
-                 extra=dict(gcp=dict(bucket=self.index, file_name=filename, public_url=blob.public_url)))
+                 extra=extra)
 
         return blob.public_url
 
@@ -146,7 +153,12 @@ class BaseExecutor:
         return result
 
     def _action(self, value, confidence, image, uuid, **kwargs):
-        file = getattr(self, self.save_file_function)(value, image, uuid)
+        log.info("#starting #base _action")
+
+        if self.save_file_function:
+            file = getattr(self, self.save_file_function)(value, image, uuid)
+        else:
+            file = None
 
         self.rdb.set_val(uuid, dict(value=value, confidence=confidence), **dict(kwargs))
 
@@ -173,21 +185,29 @@ class BaseExecutor:
 
     @staticmethod
     def save_image_locally(value, image, uuid, folder, ext):
-        filename = "{}_{}.{}".format(value, uuid, ext)
+        file_name = "{}_{}.{}".format(value, uuid, ext)
 
-        full_path = "{}/{}/{}".format(BASE_PATH, folder, filename)
+        file_dir = "{}/{}".format(BASE_PATH, folder)
 
-        log.info("#saving #image #locally", extra=dict(file_name=filename, folder=folder, full_path=full_path, ext=ext))
+        try:
+            log.info("#creating #direcotory", extra=dict(dir=file_dir))
+            mkdir(file_dir)
+        except FileExistsError:
+            log.info("#direcotory already #exists", extra=dict(dir=file_dir))
+            pass
+
+        full_path = "{}/{}".format(file_dir, file_name)
+
+        extra = dict(file_name=file_name, folder=folder, full_path=full_path, ext=ext)
+
+        log.info("#saving #image #locally",
+                 extra=extra)
 
         cv2.imwrite(full_path, image)
 
-        log.info("#saved #image #locally", extra=dict(filePath=full_path, folder=folder, full_path=full_path, ext=ext))
+        log.info("#saved #image #locally", extra=extra)
 
         return full_path
-
-    @staticmethod
-    def skip(*args, **kwargs):
-        pass
 
     @staticmethod
     def _get_storage_client():

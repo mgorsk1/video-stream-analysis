@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "disable_existing_loggers": false,
   "formatters": {
     "simple": {
       "format": "%(asctime)s %(levelname)s %(process)d %(threadName)s %(module)s %(funcName)s %(lineno)s %(message)s"
@@ -18,26 +19,31 @@
     "file": {
       "class": "logging.handlers.TimedRotatingFileHandler",
       "formatter": "json",
-      "filename": "{log_file_path}/{app_name}.log",
+      "filename": "$log_file_path/$app_name.log",
       "when": "midnight",
       "interval": 1,
       "backupCount": 14
-    }
-  },
-  "loggers": {
-    "main": {
-      "level": "{log_level}",
-      "handlers": [
-        "console",
-        "file"
-      ]
+    },
+    "elasticsearch": {
+      "level": "DEBUG",
+      "class": "cmreslogging.handlers.CMRESHandler",
+      "hosts": [
+        {
+          "host": "localhost",
+          "port": 9200
+        }
+      ],
+      "es_index_name": "video-analysis-log",
+      "es_doc_type": "_doc"
     }
   },
   "root": {
-    "level": "{log_level}",
+    "level": "$log_level",
     "handlers": [
       "console",
-      "file"
-    ]
+      "file",
+      "elasticsearch"
+    ],
+    "propagate": true
   }
 }

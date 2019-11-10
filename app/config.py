@@ -1,7 +1,9 @@
-from app.logger import prepare
 from os import path
-from piny import YamlLoader
 from types import SimpleNamespace
+
+from piny import YamlLoader
+
+from app.logger import prepare
 
 
 class NestedNamespace(SimpleNamespace):

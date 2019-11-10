@@ -3,6 +3,7 @@ import logging.config
 from datetime import datetime
 from json import loads
 from os import path, makedirs
+from string import Template
 from sys import exc_info
 
 import pythonjsonlogger.jsonlogger
@@ -53,11 +54,13 @@ def prepare(log_level, log_dir, app_name, **kwargs):
 
     # load json config and replace placeholders with actual values
     with open('{}/../config/logger/main.json'.format(path.dirname(path.realpath(__file__))), 'r') as f:
-        d = f.read()
+        d = Template(f.read())
 
-        d = d.replace('{log_file_path}', log_dir)
-        d = d.replace('{log_level}', log_level)
-        d = d.replace('{app_name}', app_name)
+        data = dict(log_file_path=log_dir,
+                    log_level=log_level,
+                    app_name=app_name)
+
+        d = d.substitute(**data)
 
     logging.config.dictConfig(loads(d))
 
