@@ -17,15 +17,15 @@ class PeopleProspector(BaseProspector):
         super(PeopleProspector, self).__init__(*args, **kwargs)
 
         self.face_classifier = cv2.CascadeClassifier(
-            '{}/resources/cascades/data/haarcascade_frontalface_alt2.xml'.format(BASE_PATH))
+            f'{BASE_PATH}/resources/cascades/data/haarcascade_frontalface_alt2.xml')
 
         self.recognizer = cv2.face.LBPHFaceRecognizer_create()
-        self.recognizer.read('{}/resources/recognizers/face-trainer.yml'.format(BASE_PATH))
+        self.recognizer.read(f'{BASE_PATH}/resources/recognizers/face-trainer.yml')
 
         self.labels = dict()
 
-        face_labels_dir = '{}/resources/pickles/'.format(BASE_PATH)
-        face_labels_file = '{}/face-labels.pickle'.format(face_labels_dir)
+        face_labels_dir = f'{BASE_PATH}/resources/pickles/'
+        face_labels_file = f'{face_labels_dir}/face-labels.pickle'
 
         with open(face_labels_file, 'rb') as f:
             og_labels = pickle.load(f)

@@ -43,7 +43,7 @@ class CustomLoggingAdapter(logging.LoggerAdapter):
 
 
 def prepare(log_level, log_dir, app_name, **kwargs):
-    log_dir = log_dir if log_dir.endswith('/log') else '{}/log'.format(log_dir)
+    log_dir = log_dir if log_dir.endswith('/log') else f'{log_dir}/log'
 
     # create log_dir
     try:
@@ -53,7 +53,7 @@ def prepare(log_level, log_dir, app_name, **kwargs):
         print(exc_info())
 
     # load json config and replace placeholders with actual values
-    with open('{}/../config/logger/main.json'.format(path.dirname(path.realpath(__file__))), 'r') as f:
+    with open(f'{path.dirname(path.realpath(__file__))}/../config/logger/main.json', 'r') as f:
         d = Template(f.read())
 
         data = dict(log_file_path=log_dir,

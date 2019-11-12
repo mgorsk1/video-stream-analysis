@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from elasticsearch import Elasticsearch, ElasticsearchException, NotFoundError
 
-from app.config import log
+from app.config import log, BASE_PATH
 from app.dbs.base import BaseDatabase
 
 
@@ -109,7 +109,7 @@ class ResultDatabase(BaseDatabase):
         template_name_file = template_name.replace('-', '_') + '_template.json'
 
         if not self._check_if_template_exists(template_name):
-            with open('../resources/elastic/{}'.format(template_name_file)) as f:
+            with open(f'{BASE_PATH}/resources/elastic/{template_name_file}') as f:
                 template_body = f.read()
 
             try:

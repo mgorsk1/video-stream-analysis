@@ -1,5 +1,5 @@
 from json import dumps
-from os import getenv, environ, remove, mkdir
+from os import getenv, remove, mkdir
 from time import time
 from uuid import uuid4
 
@@ -24,7 +24,7 @@ class BaseExecutor:
 
         self.bucket_folder_name = underscore(self.__class__.__name__)
 
-        self.index = 'video-analysis-{}'.format(self.bucket_folder_name)
+        self.index = f'video-analysis-{self.bucket_folder_name}'
 
         self.rdb = ResultDatabase(config.resultDb.connection.host,
                                   config.resultDb.connection.port, self.index,
@@ -75,9 +75,9 @@ class BaseExecutor:
     def save_image_to_gcp(self, value, image, uuid):
         tmp_file = BaseExecutor.save_image_locally(value, image, uuid, 'tmp', 'png')
 
-        filename = '{}_{}.png'.format(value, uuid)
+        filename = f'{value}_{uuid}.png'
 
-        blob = self.bucket.blob('{}/{}'.format(self.bucket_folder_name, filename))
+        blob = self.bucket.blob(f'{self.bucket_folder_name}/{filename}')
 
         extra = dict(gcp=dict(bucket=self.index, file_name=filename, public_url=blob.public_url))
 
@@ -183,9 +183,9 @@ class BaseExecutor:
 
     @staticmethod
     def save_image_locally(value, image, uuid, folder, ext):
-        file_name = '{}_{}.{}'.format(value, uuid, ext)
+        file_name = f'{value}_{uuid}.{ext}'
 
-        file_dir = '{}/{}'.format(BASE_PATH, folder)
+        file_dir = f'{BASE_PATH}/{folder}'
 
         try:
             log.info('#creating #direcotory', extra=dict(dir=file_dir))
@@ -194,7 +194,7 @@ class BaseExecutor:
             log.info('#direcotory already #exists', extra=dict(dir=file_dir))
             pass
 
-        full_path = '{}/{}'.format(file_dir, file_name)
+        full_path = f'{file_dir}/{file_name}'
 
         extra = dict(file_name=file_name, folder=folder, full_path=full_path, ext=ext)
 

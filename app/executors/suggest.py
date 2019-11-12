@@ -52,4 +52,3 @@ class TrashCanSuggester(BaseSuggester):
     def _suggest(self, value, category):
         # @todo make actual suggestion
         print(value, category, time())
-

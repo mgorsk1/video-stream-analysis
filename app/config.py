@@ -18,6 +18,6 @@ class NestedNamespace(SimpleNamespace):
 
 BASE_PATH = path.dirname(__file__) + '/..'
 
-config = NestedNamespace(YamlLoader(path='{}/config/application/application.yaml'.format(BASE_PATH)).load())
+config = NestedNamespace(YamlLoader(path=f'{BASE_PATH}/config/application/application.yaml').load())
 
 log = prepare(config.log.level.upper(), '/tmp', 'VideoAnalysis')
