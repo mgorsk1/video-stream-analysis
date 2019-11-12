@@ -16,18 +16,18 @@ class LicensePlateProspector(BaseProspector):
     def __init__(self, *args, **kwargs):
         super(LicensePlateProspector, self).__init__(*args, **kwargs)
 
-        environ['TESSDATA_PREFIX'] = "{}/resources/runtime/ocr/".format(BASE_PATH)
-        environ['LD_LIBRARY_PATH'] = "/usr/lib/"
+        environ['TESSDATA_PREFIX'] = '{}/resources/runtime/ocr/'.format(BASE_PATH)
+        environ['LD_LIBRARY_PATH'] = '/usr/lib/'
 
-        self.alpr = Alpr("eu", "{}/config/openalpr.confidence".format(BASE_PATH),
-                         "{}/resources/runtime/".format(BASE_PATH))
+        self.alpr = Alpr('eu', '{}/config/openalpr.confidence'.format(BASE_PATH),
+                         '{}/resources/runtime/'.format(BASE_PATH))
 
         if not self.alpr.is_loaded():
-            log.error("ALPR NOT LOADED")
+            log.error('ALPR NOT LOADED')
             exit(1)
 
         self.alpr.set_top_n(10)
-        self.alpr.set_default_region("pl")
+        self.alpr.set_default_region('pl')
 
     def search(self, frame, **kwargs):
         frame = frame.copy()

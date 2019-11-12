@@ -8,7 +8,7 @@ __all__ = ['OpenCVCameraStreamer']
 
 
 class OpenCVCameraStreamer(BaseStreamer):
-    camera_properties = {k: v for k, v in globals().get("cv2", dict()).__dict__.items() if k.startswith('CAP_PROP_')}
+    camera_properties = {k: v for k, v in globals().get('cv2', dict()).__dict__.items() if k.startswith('CAP_PROP_')}
 
     def __init__(self, *args, **kwargs):
         super(OpenCVCameraStreamer, self).__init__(*args, **kwargs)

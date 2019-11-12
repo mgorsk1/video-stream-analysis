@@ -20,7 +20,7 @@ class BaseExecutor:
     def __init__(self, *args, **kwargs):
         super(BaseExecutor, self).__init__(*args, **kwargs)
 
-        self.reset_after = kwargs.get('reset_after', 60)
+        self.reset_after = kwargs.get('executor_reset_after', 60)
 
         self.bucket_folder_name = underscore(self.__class__.__name__)
 
@@ -52,48 +52,48 @@ class BaseExecutor:
     def action(self, value, confidence, image, uuid, **kwargs):
         exact_match = self.rdb.get_val(value, field='value', ago=self.reset_after, fuzzy=False)
         if exact_match is None:
-            log.info("#value does not exist in result #database", extra=dict(value=value))
+            log.info('#value does not exist in result #database', extra=dict(value=value))
             fuzzy_match = self.rdb.get_val(value, field='value', ago=self.reset_after, fuzzy=True)
             if fuzzy_match is None:
-                log.info("#similar #value does not exist in result #database", extra=dict(value=value))
+                log.info('#similar #value does not exist in result #database', extra=dict(value=value))
                 candidates_match = self.rdb.get_val(value, field='candidates', ago=self.reset_after, fuzzy=False)
                 if candidates_match is None:
-                    log.info("#value does #not #exist amongst candidates in #database", extra=dict(value=value))
+                    log.info('#value does #not #exist amongst candidates in #database', extra=dict(value=value))
 
                     self._action(value, confidence, image, uuid, **dict(kwargs))
 
-                    log.info("#notification #sent about value", extra=dict(value=value, confidence=confidence))
+                    log.info('#notification #sent about value', extra=dict(value=value, confidence=confidence))
                 else:
-                    log.info("#value #existed amongst #candidates in #database", extra=dict(value=value))
+                    log.info('#value #existed amongst #candidates in #database', extra=dict(value=value))
             else:
-                log.info("#value #matched another #similar value in #database", extra=dict(value=value))
+                log.info('#value #matched another #similar value in #database', extra=dict(value=value))
         else:
-            log.info("#value #existed in #database", extra=dict(value=value))
+            log.info('#value #existed in #database', extra=dict(value=value))
 
         pass
 
     def save_image_to_gcp(self, value, image, uuid):
         tmp_file = BaseExecutor.save_image_locally(value, image, uuid, 'tmp', 'png')
 
-        filename = "{}_{}.png".format(value, uuid)
+        filename = '{}_{}.png'.format(value, uuid)
 
         blob = self.bucket.blob('{}/{}'.format(self.bucket_folder_name, filename))
 
         extra = dict(gcp=dict(bucket=self.index, file_name=filename, public_url=blob.public_url))
 
-        log.info("#saving #image to #gcp",
+        log.info('#saving #image to #gcp',
                  extra=extra)
 
         try:
-            blob.upload_from_filename(tmp_file, content_type="image/png")
+            blob.upload_from_filename(tmp_file, content_type='image/png')
         except Exception:
-            log.error("#error #uploading #image to #gcp",
+            log.error('#error #uploading #image to #gcp',
                       extra=extra,
                       exc_info=True)
 
         remove(tmp_file)
 
-        log.info("#saved #image to #gcp",
+        log.info('#saved #image to #gcp',
                  extra=extra)
 
         return blob.public_url
@@ -102,22 +102,22 @@ class BaseExecutor:
         """
         Send request to pushover_notify API with data:
 
-        token (required) - your application"s API token
+        token (required) - your application's API token
         user (required) - the user/group key (not e-mail address) of your user (or you), viewable when logged into our
         dashboard (often referred to as USER_KEY in our documentation and code examples)
         message (required) - your message
         Some optional parameters may be included:
         attachment - an image attachment to send with the message; see attachments for more information on how to
         upload files
-        device - your user"s device name to send the message directly to that device, rather than all of the user"s
+        device - your user's device name to send the message directly to that device, rather than all of the user's
         devices (multiple devices may be separated by a comma)
-        title - your message"s title, otherwise your app"s name is used
+        title - your message's title, otherwise your app's name is used
         url - a supplementary URL to show with your message
         url_title - a title for your supplementary URL, otherwise just the URL is shown
         priority - send as -2 to generate no notification/alert, -1 to always send as a quiet notification, 1 to
-        display as high-priority and bypass the user"s quiet hours, or 2 to also require confirmation from the user
-        sound - the name of one of the sounds supported by device clients to override the user"s default sound choice
-        timestamp - a Unix timestamp of your message"s date and time to display to the user, rather than the time your
+        display as high-priority and bypass the user's quiet hours, or 2 to also require confirmation from the user
+        sound - the name of one of the sounds supported by device clients to override the user's default sound choice
+        timestamp - a Unix timestamp of your message's date and time to display to the user, rather than the time your
         message is received by our API
 
         :param title: title for message
@@ -126,7 +126,7 @@ class BaseExecutor:
         :return: -
         """
         result = None
-        device = "video-analysis"
+        device = 'video-analysis'
 
         request_data = dict(token=config.pushover.appToken,
                             user=config.pushover.userKey,
@@ -136,24 +136,24 @@ class BaseExecutor:
                             url=url)
 
         try:
-            log.info("#sending #pushover #notification", extra=dict(pushover=dict(message=message,
+            log.info('#sending #pushover #notification', extra=dict(pushover=dict(message=message,
                                                                                   title=title,
                                                                                   url=url,
                                                                                   device=device)))
 
-            result = post("https://api.pushover.net/1/messages.json", data=request_data)
+            result = post('https://api.pushover.net/1/messages.json', data=request_data)
 
-            log.info("#delivered #pushover #notification", extra=dict(pushover=dict(message=message,
+            log.info('#delivered #pushover #notification', extra=dict(pushover=dict(message=message,
                                                                                     title=title,
                                                                                     url=url,
                                                                                     device=device)))
         except HTTPError:
-            log.error("error while #sending #pushover #notification", exc_info=True)
+            log.error('error while #sending #pushover #notification', exc_info=True)
 
         return result
 
     def _action(self, value, confidence, image, uuid, **kwargs):
-        log.info("#starting #base _action")
+        log.info('#starting #base _action')
 
         if self.save_file_function:
             file = getattr(self, self.save_file_function)(value, image, uuid)
@@ -168,9 +168,7 @@ class BaseExecutor:
         self.rdb.init()
 
     def _setup_gcp(self):
-        log.info("#starting #gcp #setup")
-
-        environ['GOOGLE_APPLICATION_CREDENTIALS'] = "{}/config/gcp/key.json".format(BASE_PATH)
+        log.info('#starting #gcp #setup')
 
         client = BaseExecutor._get_storage_client()
 
@@ -181,31 +179,31 @@ class BaseExecutor:
         except Exception:
             pass
 
-        log.info("#finished #gcp setup")
+        log.info('#finished #gcp setup')
 
     @staticmethod
     def save_image_locally(value, image, uuid, folder, ext):
-        file_name = "{}_{}.{}".format(value, uuid, ext)
+        file_name = '{}_{}.{}'.format(value, uuid, ext)
 
-        file_dir = "{}/{}".format(BASE_PATH, folder)
+        file_dir = '{}/{}'.format(BASE_PATH, folder)
 
         try:
-            log.info("#creating #direcotory", extra=dict(dir=file_dir))
+            log.info('#creating #direcotory', extra=dict(dir=file_dir))
             mkdir(file_dir)
         except FileExistsError:
-            log.info("#direcotory already #exists", extra=dict(dir=file_dir))
+            log.info('#direcotory already #exists', extra=dict(dir=file_dir))
             pass
 
-        full_path = "{}/{}".format(file_dir, file_name)
+        full_path = '{}/{}'.format(file_dir, file_name)
 
         extra = dict(file_name=file_name, folder=folder, full_path=full_path, ext=ext)
 
-        log.info("#saving #image #locally",
+        log.info('#saving #image #locally',
                  extra=extra)
 
         cv2.imwrite(full_path, image)
 
-        log.info("#saved #image #locally", extra=extra)
+        log.info('#saved #image #locally', extra=extra)
 
         return full_path
 
@@ -219,7 +217,10 @@ class FastTrackBaseExecutor(BaseExecutor):
     FastTrackBaseExecutor class should be used when we want to skip checks in Result Database.
     """
 
+    def __init__(self, *args, **kwargs):
+        super(FastTrackBaseExecutor, self).__init__(*args, **kwargs)
+
     def action(self, value, confidence, image, uuid, **kwargs):
-        log.info("#fast tracking #processing", extra=dict(value=value))
+        log.info('#fast tracking #processing', extra=dict(value=value))
 
         self._action(value, confidence, image, uuid, **dict(kwargs))

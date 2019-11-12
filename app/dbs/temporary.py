@@ -26,9 +26,9 @@ class TemporaryDatabase(BaseDatabase):
         try:
             db_info = self.db.info()
 
-            log.info("established #connection with #redis", extra=dict(redis=db_info))
+            log.info('established #connection with #redis', extra=dict(redis=db_info))
         except Exception:
-            log.error("error while establishing #connection with #redis", exc_info=True)
+            log.error('error while establishing #connection with #redis', exc_info=True)
 
             exit(1)
 

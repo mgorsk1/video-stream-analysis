@@ -11,7 +11,7 @@ class BaseOpener(ABC, BaseExecutor):
     def __init__(self, *args, **kwargs):
         super(BaseOpener, self).__init__(*args, **kwargs)
 
-        self.open_time = kwargs.get('open_time', 120)
+        self.open_time = kwargs.get('opener_open_time', 120)
 
     def _action(self, value, confidence, image, uuid, **kwargs):
         super(BaseOpener, self)._action(value, confidence, image, uuid, **kwargs)
@@ -24,17 +24,17 @@ class BaseOpener(ABC, BaseExecutor):
 
     def open(self, value):
         data = dict(timestamp=time(), value=value)
-        log.info(f"#opening #{self.o}", extra=data)
+        log.info(f'#opening #{self.o}', extra=data)
 
         self.tdb.set_val(format_key_open(self.o), dumps(data))
 
         self._open(value)
 
-        log.info(f"#{self.o} opened", extra=dict(value=value))
+        log.info(f'#{self.o} opened', extra=dict(value=value))
 
     def close(self, value):
         data = dict(timestamp=time(), value=value)
-        log.info(f"#closing #{self.o}", extra=data)
+        log.info(f'#closing #{self.o}', extra=data)
 
         self.tdb.del_val(format_key_open(self.o))
 

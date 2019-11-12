@@ -32,9 +32,9 @@ class ResultDatabase(BaseDatabase):
         try:
             db_info = self.db.info()
 
-            log.info("established #connection with #elasticsearch", extra=dict(elasticsearch=db_info))
+            log.info('established #connection with #elasticsearch', extra=dict(elasticsearch=db_info))
         except ElasticsearchException:
-            log.error("error while establishing #connection with #elasticsearch", exc_info=True)
+            log.error('error while establishing #connection with #elasticsearch', exc_info=True)
 
             exit(1)
 
@@ -59,11 +59,11 @@ class ResultDatabase(BaseDatabase):
             pass
 
         if dict(kwargs).get('fuzzy', False):
-            query = {"query": {"bool": {"must": {"match": {field: {"query": key, "fuzziness": 1}}},
-                                        "filter": {"range": {"@timestamp": {"gte": time_ago}}}}}}
+            query = {'query': {'bool': {'must': {'match': {field: {'query': key, 'fuzziness': 1}}},
+                                        'filter': {'range': {'@timestamp': {'gte': time_ago}}}}}}
         else:
-            query = {"query": {
-                "bool": {"must": {"match": {field: key}}, "filter": {"range": {"@timestamp": {"gte": time_ago}}}}}}
+            query = {'query': {
+                'bool': {'must': {'match': {field: key}}, 'filter': {'range': {'@timestamp': {'gte': time_ago}}}}}}
 
         search = self.db.search(self.index, self.index_type, query)
 
@@ -101,9 +101,9 @@ class ResultDatabase(BaseDatabase):
     def _create_index(self):
         try:
             self.db.indices.create(self.index)
-            log.info("#index successfully #created", extra=dict(index=self.index))
+            log.info('#index successfully #created', extra=dict(index=self.index))
         except ElasticsearchException:
-            log.warn("#index #exists", exc_info=True, extra=dict(index=self.index))
+            log.warn('#index #exists', exc_info=True, extra=dict(index=self.index))
 
     def _install_index_template(self, template_name):
         template_name_file = template_name.replace('-', '_') + '_template.json'
@@ -114,9 +114,9 @@ class ResultDatabase(BaseDatabase):
 
             try:
                 if template_body is not None:
-                    self.db.indices.put_template(name=template_name, body=template_body, master_timeout="60s")
+                    self.db.indices.put_template(name=template_name, body=template_body, master_timeout='60s')
 
-                    log.info("#template successfully #registered", extra=dict(template_name=template_name,
+                    log.info('#template successfully #registered', extra=dict(template_name=template_name,
                                                                               template_body=template_body))
                 else:
                     log.warning('#template body does #not #exist - index template has not been registered',

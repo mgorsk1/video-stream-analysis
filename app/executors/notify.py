@@ -7,7 +7,7 @@ class PushoverNotifier(BaseExecutor):
     def __init__(self, *args, **kwargs):
         super(PushoverNotifier, self).__init__(*args, **kwargs)
 
-        notification_type = kwargs.get("notification_type", "default")
+        notification_type = kwargs.get('notifier_notification_type', 'default')
 
         with open(f'{BP}/resources/notifications/{notification_type}/title.txt', 'r') as f:
             self.notification_title = f.read()
@@ -20,12 +20,12 @@ class PushoverNotifier(BaseExecutor):
     def _action(self, value, confidence, image, uuid, **kwargs):
         super(PushoverNotifier, self)._action(value, confidence, image, uuid, **kwargs)
 
-        log.info("#running _action")
+        log.info('#running _action')
 
         extra = dict(value=value, confidence=confidence, uuid=uuid)
         extra['kwargs'] = kwargs
 
-        log.info("#notyfing pushover about #rascal", extra=extra)
+        log.info('#notyfing pushover about #rascal', extra=extra)
 
         file = super(PushoverNotifier, self)._action(value, confidence, image, uuid, **kwargs)
 
@@ -44,4 +44,4 @@ class PushoverNotifier(BaseExecutor):
                     self.notification_body.format(**data_for_template),
                     file)
 
-        log.info("#pushover notified about #rascal", extra=dict(value=dict(value=value)))
+        log.info('#pushover notified about #rascal', extra=dict(value=dict(value=value)))

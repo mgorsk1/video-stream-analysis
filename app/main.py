@@ -1,28 +1,26 @@
-from app.agents import LicensePlateOpenCVVigilanteAgent
+from app.agents import *
+
+AGENTS = dict(parking=LicensePlateOpenCVVigilanteAgent,
+              gate=LicensePlateOpenCVGatekeeperAgent,
+              trash=TrashOpenCVSuggestAgent)
+
+a = 'trash'
 
 
 def run():
     camera_url = -1
     # camera_url = 'http://195.1.188.76/mjpg/video.mjpg'
 
-    # interpreter = LicensePlateProspector(60, Whistleblower(8 * 60 * 60, grace_period=5))
-    #
-    # additional_data = ))
-    #
-    # stream = CameraStreamOpenCV(30, interpreter, True, **additional_data)
-    #
-    # stream.run()
+    agent = AGENTS.get(a)
 
-    agent = LicensePlateOpenCVVigilanteAgent(
-        **dict(grace_period=5,
-               desired_fps=5,
-               precision=92,
-               display_frame=False,
-               reset_after=30,
-               notification_type='parking_violation',
-               camera_metadata=dict(camera_url=camera_url,
-                                    general=dict(model='HP', id=17,
-                                                 location='Radom'))))
+    agent = agent(prospector_precision=70,
+                  analyzer_grace_period=0,
+                  executor_reset_after=5,
+                  streamer_desired_fps=2,
+                  streamer_display_frame=False,
+                  streamer_camera_metadata=dict(camera_url=camera_url,
+                                                general=dict(model='HP', id=17,
+                                                             location='Radom')))
 
     agent.run()
 

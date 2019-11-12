@@ -1,4 +1,4 @@
-from app.analyzers.brainless import Brainless
+from app.analyzers.base import BaseAnalyzer
 from app.analyzers.gatekeeper import Gatekeeper
 from app.analyzers.vigilante import Vigilante
 from app.executors.notify import PushoverNotifier
@@ -17,5 +17,5 @@ class LicensePlateOpenCVVigilanteAgent(PushoverNotifier, Vigilante, LicensePlate
     pass
 
 
-class TrashOpenCVSuggestAgent(TrashCanSuggester, Brainless, ObjectGCPProspector, OpenCVCameraStreamer):
+class TrashOpenCVSuggestAgent(TrashCanSuggester, BaseAnalyzer, ObjectGCPProspector, OpenCVCameraStreamer):
     pass

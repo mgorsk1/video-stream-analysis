@@ -38,7 +38,7 @@ class ObjectGCPProspector(BaseProspector):
         response = self.client.label_detection(image=img)
         annotations = {l.description: round(l.score * 100, 2) for l in response.label_annotations}
 
-        log.debug("#received #annotations", extra=dict(annotations=annotations))
+        log.debug('#received #annotations', extra=dict(annotations=annotations))
 
         result = self._get_best_pick(annotations)
 
@@ -68,7 +68,7 @@ class ObjectGCPProspector(BaseProspector):
             if category:
                 result = dict(description=description, category=category, confidence=score)
 
-                log.info("#found #best #pick", extra=dict(result=result))
+                log.info('#found #best #pick', extra=dict(result=result))
 
                 return result
 

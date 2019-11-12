@@ -20,12 +20,12 @@ class PeopleProspector(BaseProspector):
             '{}/resources/cascades/data/haarcascade_frontalface_alt2.xml'.format(BASE_PATH))
 
         self.recognizer = cv2.face.LBPHFaceRecognizer_create()
-        self.recognizer.read("{}/resources/recognizers/face-trainer.yml".format(BASE_PATH))
+        self.recognizer.read('{}/resources/recognizers/face-trainer.yml'.format(BASE_PATH))
 
         self.labels = dict()
 
-        face_labels_dir = "{}/resources/pickles/".format(BASE_PATH)
-        face_labels_file = "{}/face-labels.pickle".format(face_labels_dir)
+        face_labels_dir = '{}/resources/pickles/'.format(BASE_PATH)
+        face_labels_file = '{}/face-labels.pickle'.format(face_labels_dir)
 
         with open(face_labels_file, 'rb') as f:
             og_labels = pickle.load(f)

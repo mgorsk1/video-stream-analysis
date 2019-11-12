@@ -29,9 +29,9 @@ def log_function(func):
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        log.debug("#started #function", extra=dict(function=f_name, module=f_module, args=args, kwargs=kwargs))
+        log.debug('#started #function', extra=dict(function=f_name, module=f_module, args=args, kwargs=kwargs))
         res = func(*args, **kwargs)
-        log.debug("#finished #function", extra=dict(function=f_name, module=f_module, args=args, kwargs=kwargs))
+        log.debug('#finished #function', extra=dict(function=f_name, module=f_module, args=args, kwargs=kwargs))
         return res
 
     return wrapper

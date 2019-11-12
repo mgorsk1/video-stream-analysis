@@ -16,7 +16,7 @@ class BaseProspector(ABC):
     def __init__(self, *args, **kwargs):
         super(BaseProspector, self).__init__(*args, **kwargs)
 
-        self.precision = kwargs.get('precision')
+        self.precision = kwargs.get('prospector_precision')
 
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.fontScale = 0.5
@@ -40,7 +40,7 @@ class BaseProspector(ABC):
         result = None
 
         if len(self.levels) != len(self.names) + 1:
-            return ""
+            return ''
 
         for i in range(len(self.levels) - 1):
             if self.levels[i] < value <= self.levels[i + 1]:

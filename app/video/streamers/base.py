@@ -12,11 +12,11 @@ class BaseStreamer(ABC):
         self.camera = None
         self.fps = None
 
-        self.desired_fps = kwargs.get('desired_fps', 15)
+        self.desired_fps = kwargs.get('streamer_desired_fps', 15)
 
-        self.display_frame = kwargs.get('display_frame', False)
+        self.display_frame = kwargs.get('streamer_display_frame', False)
 
-        self.metadata = kwargs.get('camera_metadata')
+        self.metadata = kwargs.get('streamer_camera_metadata')
 
     @abstractmethod
     def get_raw_frame(self):

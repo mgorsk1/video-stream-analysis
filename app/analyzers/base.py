@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from threading import Thread, Lock
 
 from app.config import config, log
@@ -7,7 +6,7 @@ from app.dbs.temporary import TemporaryDatabase
 __all__ = ['BaseAnalyzer']
 
 
-class BaseAnalyzer(ABC):
+class BaseAnalyzer:
     """
     BaseAnalyzer is used for defining behaviour taken when object detection is made (search function).
 
@@ -19,7 +18,7 @@ class BaseAnalyzer(ABC):
     def __init__(self, *args, **kwargs):
         super(BaseAnalyzer, self).__init__(*args, **kwargs)
         # in seconds
-        self.grace_period = kwargs.get('grace_period', 60)
+        self.grace_period = kwargs.get('analyzer_grace_period', 60)
 
         self.tdb = TemporaryDatabase(config.temporaryDb.connection.host,
                                      config.temporaryDb.connection.port,
@@ -28,7 +27,7 @@ class BaseAnalyzer(ABC):
         self.lock = Lock()
 
     def analyze(self, value, confidence, image, **kwargs):
-        log.info("starting thread for #analysis of #image",
+        log.info('starting thread for #analysis of #image',
                  extra=dict(target=self.analyze, args=(value, confidence, image)))
 
         t = Thread(target=self._analyze, args=(value, confidence, image,), kwargs=dict(kwargs))
@@ -52,16 +51,19 @@ class BaseAnalyzer(ABC):
         return results, frame
 
     def take_action(self, value, confidence, image, **kwargs):
-        log.info("take #action #called", extra=dict(value=value, confidence=confidence, image=image, kwargs=kwargs))
+        log.info('take #action #called', extra=dict(value=value, confidence=confidence, image=image, kwargs=kwargs))
 
     def acquire_lock(self):
-        log.info("#acquiring #lock")
+        log.info('#acquiring #lock')
         self.lock.acquire()
 
     def release_lock(self):
-        log.info("#releasing #lock")
+        log.info('#releasing #lock')
         self.lock.release()
 
-    @abstractmethod
-    def _analyze(self, value: str, confidence: float, image, **kwargs) -> None:
-        pass
+    def _analyze(self, value, confidence, image, **kwargs):
+        log.info('#starting #analysis', extra=dict(value=value, confidence=confidence))
+
+        self.take_action(value, confidence, image, **dict(kwargs))
+
+        log.info('#finished #analysis', extra=dict(value=value, confidence=confidence))

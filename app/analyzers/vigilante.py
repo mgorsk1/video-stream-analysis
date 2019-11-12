@@ -24,21 +24,21 @@ class Vigilante(BaseAnalyzer):
         #           if no - skip
         #       if no - add to redis
         #   if yes - do nothing
-        log.info("#started #analysis", extra=dict(value=value, confidence=confidence))
+        log.info('#started #analysis', extra=dict(value=value, confidence=confidence))
 
         while self.lock.locked():
-            log.info("#waiting for #lock to be released")
+            log.info('#waiting for #lock to be released')
             sleep(1)
 
         already_filed = self.tdb.get_val(format_key_active(value))
 
         if not already_filed:
-            log.info("#action not taken yet", extra=dict(value=value))
+            log.info('#action not taken yet', extra=dict(value=value))
 
             already_detected = self.tdb.get_val(format_key_inactive(value))
 
             if already_detected:
-                log.info("detection #awaiting #action", extra=dict(value=value))
+                log.info('detection #awaiting #action', extra=dict(value=value))
 
                 data = already_detected
 
@@ -48,25 +48,25 @@ class Vigilante(BaseAnalyzer):
                 time_passed = now - time_added
 
                 if time_passed > self.grace_period:
-                    log.info("grace period has #passed", extra=dict(value=value))
+                    log.info('grace period has #passed', extra=dict(value=value))
 
                     self.acquire_lock()
                     try:
                         self.take_action(value, confidence, image, **dict(kwargs))
                     except Exception:
-                        log.warning("#error taking #action", exc_info=True)
+                        log.warning('#error taking #action', exc_info=True)
                     finally:
                         self.release_lock()
                 else:
-                    log.info("grace period has #not #passed", extra=dict(value=value))
+                    log.info('grace period has #not #passed', extra=dict(value=value))
             else:
-                log.info("#entering grace period", extra=dict(value=value))
+                log.info('#entering grace period', extra=dict(value=value))
 
                 self.tdb.set_val(format_key_inactive(value),
                                  dict(confidence=confidence, value=value,
                                       time_added=time()),
                                  ex=ceil(self.grace_period * 1.25))
         else:
-            log.info("#action already #taken", extra=dict(value=value))
+            log.info('#action already #taken', extra=dict(value=value))
 
-        log.info("#finished #analysis", extra=dict(value=value, confidence=confidence))
+        log.info('#finished #analysis', extra=dict(value=value, confidence=confidence))

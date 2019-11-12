@@ -30,17 +30,17 @@ class BaseDatabase(ABC):
     def get_val(self, key, **kwargs):
         extra = dict(key=key)
         extra['kwargs'] = kwargs
-        log.info("#getting #value", extra=extra)
+        log.info('#getting #value', extra=extra)
 
         try:
             result, metadata = self._get_val(key, **kwargs)
             extra['result'] = result
         except Exception as e:
-            log.error("#error #retrieving data", extra=extra, exc_info=True)
+            log.error('#error #retrieving data', extra=extra, exc_info=True)
 
             raise e
 
-        log.info("value retrieved", extra=extra)
+        log.info('value retrieved', extra=extra)
 
         return result
 
@@ -54,26 +54,26 @@ class BaseDatabase(ABC):
             result = self._set_val(key, value, **kwargs)
             extra['result'] = result
 
-            log.info("#setting value", extra=extra)
+            log.info('#setting value', extra=extra)
         except Exception as e:
-            log.error("#error #setting value", extra=extra, exc_info=True)
+            log.error('#error #setting value', extra=extra, exc_info=True)
 
             raise e
 
-        log.info("value #set", extra=extra)
+        log.info('value #set', extra=extra)
 
     def del_val(self, key, **kwargs):
         extra = dict(key=key)
         extra['kwargs'] = kwargs
 
-        log.info("#deleting value", extra=extra)
+        log.info('#deleting value', extra=extra)
 
         try:
             result = self._del_val(key, **kwargs)
             extra.update(result)
         except Exception as e:
-            log.error("#error #deleting value", extra=extra, exc_info=True)
+            log.error('#error #deleting value', extra=extra, exc_info=True)
 
             raise e
 
-        log.info("value #deleted", extra=extra)
+        log.info('value #deleted', extra=extra)
