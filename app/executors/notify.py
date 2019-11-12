@@ -18,6 +18,10 @@ class PushoverNotifier(BaseExecutor):
         self._setup_gcp()
 
     def _action(self, value, confidence, image, uuid, **kwargs):
+        super(PushoverNotifier, self)._action(value, confidence, image, uuid, **kwargs)
+
+        log.info("#running _action")
+
         extra = dict(value=value, confidence=confidence, uuid=uuid)
         extra['kwargs'] = kwargs
 

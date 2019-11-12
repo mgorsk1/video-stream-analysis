@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from os import getenv
 from threading import Thread, Lock
 
 from app.config import config, log

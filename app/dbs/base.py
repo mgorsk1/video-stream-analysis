@@ -30,6 +30,7 @@ class BaseDatabase(ABC):
     def get_val(self, key, **kwargs):
         extra = dict(key=key)
         extra['kwargs'] = kwargs
+        log.info("#getting #value", extra=extra)
 
         try:
             result, metadata = self._get_val(key, **kwargs)
@@ -51,7 +52,9 @@ class BaseDatabase(ABC):
 
         try:
             result = self._set_val(key, value, **kwargs)
-            extra.update(result)
+            extra['result'] = result
+
+            log.info("#setting value", extra=extra)
         except Exception as e:
             log.error("#error #setting value", extra=extra, exc_info=True)
 
@@ -63,12 +66,14 @@ class BaseDatabase(ABC):
         extra = dict(key=key)
         extra['kwargs'] = kwargs
 
+        log.info("#deleting value", extra=extra)
+
         try:
             result = self._del_val(key, **kwargs)
             extra.update(result)
         except Exception as e:
-            log.error("#error #deleting value", extra=extra)
+            log.error("#error #deleting value", extra=extra, exc_info=True)
 
             raise e
 
-        log.info("key deleted", extra=extra)
+        log.info("value #deleted", extra=extra)
