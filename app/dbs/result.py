@@ -14,7 +14,7 @@ class ResultDatabase(BaseDatabase):
         super(ResultDatabase, self).__init__(host, port, index, **kwargs)
 
         self.index = index
-        self.index_type = kwargs.get('elasticsearch_index_type', 'doc')
+        self.index_type = kwargs.get('elasticsearch_index_type', '_doc')
 
     def init(self, host, port, index, **kwargs):
         kwargs = dict(kwargs)
