@@ -14,7 +14,7 @@ google-resumable-media==0.3.2
 googleapis-common-protos
 idna==2.8
 inflection==0.3.1
-numpy==1.16.1
+numpy==1.22.0
 openalpr==1.0.12
 opencv-contrib-python==4.0.0.21
 opencv-python==4.0.0.21
